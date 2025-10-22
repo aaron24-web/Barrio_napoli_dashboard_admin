@@ -1,4 +1,4 @@
-## Front-end Pizza-shop
+## Front-end Barrio Napoli
 
 [![React](https://img.shields.io/badge/-ReactJs-61DAFB?logo=react&logoColor=black&style=for-the-badge)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/-Vite-purple?logo=vite&logoColor=white&style=for-the-badge)](https://vitejs.dev)
@@ -18,7 +18,7 @@
 
 This project focuses on exercising both the concepts we saw about React, as well as communicating with APIs via HTTP requests. Also present tests in frontend application. Pizzeria management application (administrator dashboard) using Vite, React Router DOM, React Hook Form, shadcn/ui, React Query, Vitest and more!
 
-![Demo app](https://github.com/fabiobatoni/pizza-shop/blob/main/public/pizza-shop.gif?raw=true)
+![Demo app](https://github.com/fabiobatoni/Barrio-Napoli/blob/main/public/Barrio-Napoli.gif?raw=true)
 
 ## 2. Getting Started for Developers
 
@@ -27,24 +27,24 @@ To set up a local copy of this repository:
 - For SSH (recommended for secure, key-based authentication), use:
 
   ```bash
-  git@github.com:fabiobatoni/pizza-shop.git
+  git@github.com:fabiobatoni/Barrio-Napoli.git
   ```
 
 - For HTTPS (simpler setup, ideal for quick trials), use:
 
   ```bash
-  https://github.com/fabiobatoni/pizza-shop.git
+  https://github.com/fabiobatoni/Barrio-Napoli.git
   ```
 
 ### 2.1 Installation
 
-Follow these steps to set up the Pizza.shop environment on your local
+Follow these steps to set up the Barrio Napoli environment on your local
 machine:
 
 1. **Clone the Repository and Change Directory**
 
 ```bash
-cd pizza-shop
+cd Barrio-Napoli
 ```
 
 2. **Install Project Dependencies**
@@ -66,7 +66,7 @@ pnpm install
 - This project was used as a package manager, `pnpm`
 - Before starting, make sure you have `pnpm` installed
 
-To start the pizza-shop, follow these steps:
+To start the Barrio Napoli, follow these steps:
 
 1. **Run the Application**
 
