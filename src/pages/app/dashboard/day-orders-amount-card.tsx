@@ -22,7 +22,7 @@ export function DayOrdersAmountCard() {
         {dayOrdersAmount ? (
           <>
             <span className="text-2xl font-bold tracking-tight">
-              {dayOrdersAmount.amount.toLocaleString('es-ES')}
+              {dayOrdersAmount.amount.toLocaleString('es-MX')}
             </span>
             <p className="text-xs text-muted-foreground">
               {dayOrdersAmount.diffFromYesterday >= 0 ? (

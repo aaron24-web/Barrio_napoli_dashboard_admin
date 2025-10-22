@@ -75,9 +75,9 @@ export function RevenueChart() {
                 tickLine={false}
                 width={80}
                 tickFormatter={(value: number) =>
-                  value.toLocaleString('es-ES', {
+                  value.toLocaleString('es-MX', {
                     style: 'currency',
-                    currency: 'EUR',
+                    currency: 'MXN',
                   })
                 }
               />

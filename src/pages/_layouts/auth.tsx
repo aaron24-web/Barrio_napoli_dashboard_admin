@@ -9,7 +9,7 @@ export function AuthLayout() {
       >
         <div className="flex items-center gap-3 text-lg font-medium text-foreground">
           <img src="/Barrio_Napoli_Logo.png" alt="Barrio Napoli Logo" className="h-8 w-8" />
-          <span className="font-semibold">Barrio Napoli</span>
+          <span className="font-semibold text-xl">Barrio Napoli</span>
         </div>
         <footer className="text-sm">Paínel do parceiro &copy; Barrio Napoli - {new Date().getFullYear()}</footer>
       </div>

@@ -112,9 +112,9 @@ export function OrderTableRow({ order }: OrderTableRowProps) {
       </TableCell>
       <TableCell className="font-medium">{order.customerName}</TableCell>
       <TableCell className="font-medium">
-        {(order.total / 100).toLocaleString('es-ES', {
+        {(order.total / 100).toLocaleString('es-MX', {
           style: 'currency',
-          currency: 'EUR',
+          currency: 'MXN',
         })}
       </TableCell>
       <TableCell>

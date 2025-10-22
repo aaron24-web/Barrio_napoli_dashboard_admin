@@ -22,7 +22,7 @@ export function MonthOrdersAmountCard() {
         {monthOrdersAmount ? (
           <>
             <span className="text-2xl font-bold tracking-tight">
-              {monthOrdersAmount.amount.toLocaleString('es-ES')}
+              {monthOrdersAmount.amount.toLocaleString('es-MX')}
             </span>
             <p className="text-xs text-muted-foreground">
               {monthOrdersAmount.diffFromLastMonth >= 0 ? (
