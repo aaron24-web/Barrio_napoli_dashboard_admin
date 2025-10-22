@@ -16,7 +16,7 @@ export function MonthCanceledOrdersAmountCard() {
     <Card>
       <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-base font-semibold">
-          Cancelamentos (mês)
+          Cancelaciones (mes)
         </CardTitle>
         <DollarSign className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
@@ -24,7 +24,7 @@ export function MonthCanceledOrdersAmountCard() {
         {monthCanceledOrdersAmount ? (
           <>
             <span className="text-2xl font-bold tracking-tight">
-              {monthCanceledOrdersAmount.amount.toLocaleString('pt-BR')}
+              {monthCanceledOrdersAmount.amount.toLocaleString('es-ES')}
             </span>
             <p className="text-xs text-muted-foreground">
               {monthCanceledOrdersAmount.diffFromLastMonth < 0 ? (
@@ -32,7 +32,7 @@ export function MonthCanceledOrdersAmountCard() {
                   <span className="text-emerald-500 dark:text-emerald-400">
                     {monthCanceledOrdersAmount.diffFromLastMonth}%
                   </span>{' '}
-                  em relação ao mês passado
+                  en relación al mes pasado
                 </>
               ) : (
                 <>

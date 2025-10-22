@@ -16,7 +16,7 @@ export function MonthRevenueCard() {
     <Card>
       <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-base font-semibold">
-          Receita total (mês)
+          Ingresos totales (mes)
         </CardTitle>
         <DollarSign className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
@@ -24,9 +24,9 @@ export function MonthRevenueCard() {
         {monthRevenue ? (
           <>
             <span className="text-2xl font-bold tracking-tight">
-              {(monthRevenue.receipt / 100).toLocaleString('pt-BR', {
+              {(monthRevenue.receipt / 100).toLocaleString('es-ES', {
                 style: 'currency',
-                currency: 'BRL',
+                currency: 'EUR',
               })}
             </span>
             <p className="text-xs text-muted-foreground">
@@ -35,14 +35,14 @@ export function MonthRevenueCard() {
                   <span className="text-emerald-500 dark:text-emerald-400">
                     +{monthRevenue.diffFromLastMonth}%
                   </span>{' '}
-                  em relação ao mês passado
+                  en relación al mes pasado
                 </>
               ) : (
                 <>
                   <span className="text-rose-500 dark:text-rose-400">
                     {monthRevenue.diffFromLastMonth}%
                   </span>{' '}
-                  em relação ao mês passado
+                  en relación al mes pasado
                 </>
               )}
             </p>

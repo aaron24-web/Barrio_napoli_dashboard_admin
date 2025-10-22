@@ -91,18 +91,18 @@ export function StoreProfileDialog() {
     try {
       await updateProfileFn({ name: data.name, description: data.description })
 
-      toast.success('Perfil atualizado com sucesso !')
+      toast.success('¡Perfil actualizado con éxito!')
     } catch {
-      toast.error('Falha ao atualizar o perfil, tente novamente')
+      toast.error('Error al actualizar el perfil, inténtalo de nuevo.')
     }
   }
 
   return (
     <DialogContent>
       <DialogHeader>
-        <DialogTitle>Perfil da loja</DialogTitle>
+        <DialogTitle>Perfil de la tienda</DialogTitle>
         <DialogDescription>
-          Atualize as informações do seu estabelecimento visíveis ao seu cliente
+          Actualiza la información de tu establecimiento visible para tu cliente
         </DialogDescription>
       </DialogHeader>
 
@@ -110,14 +110,14 @@ export function StoreProfileDialog() {
         <div className="space-y-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
             <Label className="text-right" htmlFor="name">
-              Nome
+              Nombre
             </Label>
             <Input className="col-span-3" id="name" {...register('name')} />
           </div>
 
           <div className="grid grid-cols-4 items-center gap-4">
             <Label className="text-right" htmlFor="description">
-              Descrição
+              Descripción
             </Label>
             <Textarea
               className="col-span-3"
@@ -134,7 +134,7 @@ export function StoreProfileDialog() {
             </Button>
           </DialogClose>
           <Button type="submit" variant="success" disabled={isSubmitting}>
-            Salvar
+            Guardar
           </Button>
         </DialogFooter>
       </form>

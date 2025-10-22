@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { formatDistanceToNow } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
+import { es } from 'date-fns/locale'
 import { ArrowRight, Search, X } from 'lucide-react'
 import { useState } from 'react'
 
@@ -92,7 +92,7 @@ export function OrderTableRow({ order }: OrderTableRowProps) {
           <DialogTrigger asChild>
             <Button variant="outline" size="xs">
               <Search className="h-3 w-3" />
-              <span className="sr-only">Detalhes do pedido</span>
+              <span className="sr-only">Detalles del pedido</span>
             </Button>
           </DialogTrigger>
           <OrderDetails open={isDetailsOpen} orderId={order.orderId} />
@@ -103,7 +103,7 @@ export function OrderTableRow({ order }: OrderTableRowProps) {
       </TableCell>
       <TableCell className="text-muted-foreground">
         {formatDistanceToNow(order.createdAt, {
-          locale: ptBR,
+          locale: es,
           addSuffix: true,
         })}
       </TableCell>
@@ -112,9 +112,9 @@ export function OrderTableRow({ order }: OrderTableRowProps) {
       </TableCell>
       <TableCell className="font-medium">{order.customerName}</TableCell>
       <TableCell className="font-medium">
-        {(order.total / 100).toLocaleString('pt-BR', {
+        {(order.total / 100).toLocaleString('es-ES', {
           style: 'currency',
-          currency: 'BRL',
+          currency: 'EUR',
         })}
       </TableCell>
       <TableCell>
@@ -126,7 +126,7 @@ export function OrderTableRow({ order }: OrderTableRowProps) {
             size="xs"
           >
             <ArrowRight className="mr-2 h-3 w-3" />
-            Aprovar
+            Aprobar
           </Button>
         )}
 
@@ -138,7 +138,7 @@ export function OrderTableRow({ order }: OrderTableRowProps) {
             size="xs"
           >
             <ArrowRight className="mr-2 h-3 w-3" />
-            Em entrega
+            En reparto
           </Button>
         )}
 
@@ -150,7 +150,7 @@ export function OrderTableRow({ order }: OrderTableRowProps) {
             size="xs"
           >
             <ArrowRight className="mr-2 h-3 w-3" />
-            Entregue
+            Entregado
           </Button>
         )}
       </TableCell>

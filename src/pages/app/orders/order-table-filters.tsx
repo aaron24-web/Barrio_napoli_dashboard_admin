@@ -90,12 +90,12 @@ export function OrderTableFilters() {
     >
       <span className="text-sm font-semibold">Filtros</span>
       <Input
-        placeholder="ID do pedido"
+        placeholder="ID del pedido"
         className="h-8 w-auto"
         {...register('orderId')}
       />
       <Input
-        placeholder="nome do cliente"
+        placeholder="Nombre del cliente"
         className="h-8 w-[320px]"
         {...register('customerName')}
       />
@@ -115,12 +115,12 @@ export function OrderTableFilters() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos status</SelectItem>
-                <SelectItem value="pending">Pendente</SelectItem>
+                <SelectItem value="all">Todos los estados</SelectItem>
+                <SelectItem value="pending">Pendiente</SelectItem>
                 <SelectItem value="canceled">Cancelado</SelectItem>
-                <SelectItem value="processing">Em preparo</SelectItem>
-                <SelectItem value="delivery">Em entrega</SelectItem>
-                <SelectItem value="delivered">Entregue</SelectItem>
+                <SelectItem value="processing">En preparación</SelectItem>
+                <SelectItem value="delivery">En reparto</SelectItem>
+                <SelectItem value="delivered">Entregado</SelectItem>
               </SelectContent>
             </Select>
           )
