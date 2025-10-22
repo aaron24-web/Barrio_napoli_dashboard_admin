@@ -41,40 +41,40 @@ export function SignUp() {
         phone: data.phone,
       })
 
-      toast.success('Restaurante cadastrado com sucesso', {
+      toast.success('Restaurante registrado con éxito', {
         action: {
-          label: 'Login',
+          label: 'Iniciar sesión',
           onClick: () => navigate(`/sign-in?email=${data.email}`),
         },
       })
     } catch {
-      toast.error('Erro ao cadastrar restaurante')
+      toast.error('Error al registrar el restaurante')
     }
   }
 
   return (
     <>
-      <Helmet title="Cadastro" />
+      <Helmet title="Registro" />
       <div className="p-8">
         <Button variant="ghost" asChild>
           <Link to="/sign-in" className="absolute right-8 top-8">
-            Fazer login
+            Iniciar sesión
           </Link>
         </Button>
 
         <div className="flex w-[350px] flex-col justify-center gap-6">
           <div className="flex flex-col gap-2 text-center">
             <h1 className="text-2xl font-semibold tracking-tight">
-              Criar conta grátis
+              Crear cuenta gratis
             </h1>
             <p className="text-sm text-muted-foreground">
-              Seja um parceiro e comece suas vendas!
+              ¡Sé un socio y comienza tus ventas!
             </p>
           </div>
 
           <form onSubmit={handleSubmit(handleSignUp)} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="restaurantName">Nome do estabelecimento</Label>
+              <Label htmlFor="restaurantName">Nombre del establecimiento</Label>
               <Input
                 id="restaurantName"
                 type="text"
@@ -83,7 +83,7 @@ export function SignUp() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="managerName">Seu nome</Label>
+              <Label htmlFor="managerName">Tu nombre</Label>
               <Input
                 id="managerName"
                 type="text"
@@ -92,27 +92,27 @@ export function SignUp() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">Seu e-mail</Label>
+              <Label htmlFor="email">Tu correo electrónico</Label>
               <Input id="email" type="email" {...register('email')} />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phone">Seu celular</Label>
+              <Label htmlFor="phone">Tu teléfono móvil</Label>
               <Input id="phone" type="tel" {...register('phone')} />
             </div>
 
             <Button disabled={isSubmitting} className="w-full" type="submit">
-              Finalizar Cadastro
+              Finalizar registro
             </Button>
 
             <p className="px-6 text-center text-sm leading-relaxed text-muted-foreground">
-              Ao continuar, você concorda com nossos{' '}
+              Al continuar, aceptas nuestros{' '}
               <a className="underline underline-offset-4" href="#">
-                termos de serviço
+                términos de servicio
               </a>{' '}
-              e{' '}
+              y{' '}
               <a className="underline underline-offset-4" href="#">
-                políticas de privacidade
+                políticas de privacidad
               </a>
               .
             </p>

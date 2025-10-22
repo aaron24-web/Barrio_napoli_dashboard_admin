@@ -37,45 +37,45 @@ export function SignIn() {
     try {
       await authenticate({ email: data.email })
 
-      toast.success('Enviamos um link de autenticação para seu e-mail', {
+      toast.success('Hemos enviado un enlace de autenticación a tu correo electrónico', {
         action: {
           label: 'Reenviar',
           onClick: () => handleSignIn(data),
         },
       })
     } catch {
-      toast.error('Credenciais inválidas.')
+      toast.error('Credenciales inválidas.')
     }
   }
 
   return (
     <>
-      <Helmet title="login" />
+      <Helmet title="iniciar sesión" />
       <div className="p-8">
         <Button variant="ghost" asChild>
           <Link to="/sign-up" className="absolute right-8 top-8">
-            Novo estabelecimento
+            Nuevo establecimiento
           </Link>
         </Button>
 
         <div className="flex w-[350px] flex-col justify-center gap-6">
           <div className="flex flex-col gap-2 text-center">
             <h1 className="text-2xl font-semibold tracking-tight">
-              Acessar painel
+              Acceder al panel
             </h1>
             <p className="text-sm text-muted-foreground">
-              Acompanhe suas vendas pelo painel do parceiro!
+              ¡Sigue tus ventas desde el panel de socio!
             </p>
           </div>
 
           <form onSubmit={handleSubmit(handleSignIn)} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Seu e-mail</Label>
+              <Label htmlFor="email">Tu correo electrónico</Label>
               <Input id="email" type="email" {...register('email')} />
             </div>
 
             <Button disabled={isSubmitting} className="w-full" type="submit">
-              Acessar painel
+              Acceder al panel
             </Button>
           </form>
         </div>
