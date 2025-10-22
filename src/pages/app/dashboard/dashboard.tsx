@@ -8,7 +8,7 @@ import { DeliveryMap } from '../live-orders/delivery-map'
 import { IncomingOrdersList } from '../live-orders/incoming-orders-list'
 import { OrderActionsPanel } from '../live-orders/order-actions-panel'
 import { Dialog } from '@/components/ui/dialog'
-import { DeliveryPersonInfo } from '../live-orders/delivery-person-info'
+import { DeliveryPersonInfo } from '@/pages/app/live-orders/delivery-person-info'
 
 export interface DeliveryPerson {
   id: string
