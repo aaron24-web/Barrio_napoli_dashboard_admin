@@ -6,6 +6,7 @@ import { NotFound } from './404'
 import { Dashboard } from './app/dashboard/dashboard'
 import { Orders } from './app/orders/orders'
 import { Products } from './app/business/products'
+import { Categories } from './app/business/categories'
 import { SignIn } from './auth/sign-in'
 import { SignUp } from './auth/sign-up'
 import { Error } from './error'
@@ -19,6 +20,7 @@ export const router = createBrowserRouter([
       { path: '/', element: <Dashboard /> },
       { path: '/orders', element: <Orders /> },
       { path: '/business/products', element: <Products /> },
+      { path: '/business/categories', element: <Categories /> },
     ],
   },
   {

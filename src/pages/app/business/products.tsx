@@ -5,12 +5,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Pagination } from '@/components/pagination'
 
-const categories = ['Pizzas', 'Bebidas', 'Postres']
+const initialCategories = ['Pizzas', 'Bebidas', 'Postres']
 
 const productsData = [
   { id: 1, name: 'Pizza Napolitana', price: 150, availability: true, category: 'Pizzas' },
@@ -22,6 +22,10 @@ const productsData = [
 
 export function Products() {
   const [products, setProducts] = useState(productsData)
+  const [categories, setCategories] = useState(() => {
+    const storedCategories = localStorage.getItem('categories')
+    return storedCategories ? JSON.parse(storedCategories).map(c => c.name) : initialCategories
+  })
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingProduct, setEditingProduct] = useState<any | null>(null)
   const [search, setSearch] = useState('')
@@ -72,6 +76,7 @@ export function Products() {
                 product={editingProduct}
                 onSubmit={editingProduct ? handleUpdateProduct : handleCreateProduct}
                 onCancel={() => setIsDialogOpen(false)}
+                categories={categories}
               />
             </DialogContent>
           </Dialog>
@@ -148,7 +153,7 @@ export function Products() {
   )
 }
 
-function ProductForm({ product, onSubmit, onCancel }) {
+function ProductForm({ product, onSubmit, onCancel, categories }) {
   const [name, setName] = useState(product?.name || '')
   const [price, setPrice] = useState(product?.price || '')
   const [category, setCategory] = useState(product?.category || categories[0])
