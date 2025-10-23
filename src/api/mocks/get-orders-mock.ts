@@ -17,7 +17,7 @@ const statuses: OrderStatus[] = [
 const orders: Orders = Array.from({ length: 60 }).map((_, i) => {
   return {
     orderId: `order-${i + 1}`,
-    customerName: `Customer ${i + 1}`,
+    customerName: i === 0 ? 'Aaron Tun' : `Customer ${i + 1}`,
     createdAt: new Date().toISOString(),
     total: 2400,
     status: statuses[i % 5],
@@ -51,7 +51,8 @@ export const getOrdersMock = http.get<never, never, GetOrdersResponse>(
     }
 
     if (status) {
-      filteredOrders = filteredOrders.filter((order) => order.status === status)
+      const statuses = status.split(',')
+      filteredOrders = filteredOrders.filter((order) => statuses.includes(order.status))
     }
 
     const paginatedOrders = filteredOrders.slice(

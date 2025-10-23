@@ -9,15 +9,23 @@ import { useState, useEffect } from 'react'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Pagination } from '@/components/pagination'
+import { Checkbox } from '@/components/ui/checkbox'
 
 const initialCategories = ['Pizzas', 'Bebidas', 'Postres']
 
+const initialAddons = [
+  { id: 1, name: 'Queso Extra', price: 10, availability: true, category: 'Pizzas' },
+  { id: 2, name: 'Peperoni', price: 15, availability: true, category: 'Pizzas' },
+  { id: 3, name: 'Masa Delgada', price: 0, availability: false, category: 'Pizzas' },
+  { id: 4, name: 'Hielo', price: 2, availability: true, category: 'Bebidas' },
+]
+
 const productsData = [
-  { id: 1, name: 'Pizza Napolitana', price: 150, availability: true, category: 'Pizzas' },
-  { id: 2, name: 'Pizza Diavola', price: 160, availability: true, category: 'Pizzas' },
-  { id: 3, name: 'Pizza Margherita', price: 140, availability: false, category: 'Pizzas' },
-  { id: 4, name: 'Coca-Cola', price: 20, availability: true, category: 'Bebidas' },
-  { id: 5, name: 'Tiramisú', price: 50, availability: true, category: 'Postres' },
+  { id: 1, name: 'Pizza Napolitana', price: 150, availability: true, category: 'Pizzas', addons: [1, 2] },
+  { id: 2, name: 'Pizza Diavola', price: 160, availability: true, category: 'Pizzas', addons: [1, 2] },
+  { id: 3, name: 'Pizza Margherita', price: 140, availability: false, category: 'Pizzas', addons: [1] },
+  { id: 4, name: 'Coca-Cola', price: 20, availability: true, category: 'Bebidas', addons: [4] },
+  { id: 5, name: 'Tiramisú', price: 50, availability: true, category: 'Postres', addons: [] },
 ]
 
 export function Products() {
@@ -25,6 +33,10 @@ export function Products() {
   const [categories, setCategories] = useState(() => {
     const storedCategories = localStorage.getItem('categories')
     return storedCategories ? JSON.parse(storedCategories).map(c => c.name) : initialCategories
+  })
+  const [addons, setAddons] = useState(() => {
+    const storedAddons = localStorage.getItem('addons')
+    return storedAddons ? JSON.parse(storedAddons) : initialAddons
   })
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingProduct, setEditingProduct] = useState<any | null>(null)
@@ -77,6 +89,7 @@ export function Products() {
                 onSubmit={editingProduct ? handleUpdateProduct : handleCreateProduct}
                 onCancel={() => setIsDialogOpen(false)}
                 categories={categories}
+                addons={addons}
               />
             </DialogContent>
           </Dialog>
@@ -153,14 +166,21 @@ export function Products() {
   )
 }
 
-function ProductForm({ product, onSubmit, onCancel, categories }) {
+function ProductForm({ product, onSubmit, onCancel, categories, addons }) {
   const [name, setName] = useState(product?.name || '')
   const [price, setPrice] = useState(product?.price || '')
   const [category, setCategory] = useState(product?.category || categories[0])
+  const [selectedAddons, setSelectedAddons] = useState<number[]>(product?.addons || [])
+
+  const availableAddons = addons.filter(a => a.category === category)
+
+  function handleAddonToggle(addonId: number) {
+    setSelectedAddons(prev => prev.includes(addonId) ? prev.filter(id => id !== addonId) : [...prev, addonId])
+  }
 
   function handleSubmit(e) {
     e.preventDefault()
-    onSubmit({ id: product?.id, name, price: parseInt(price), category, availability: product?.availability || false })
+    onSubmit({ id: product?.id, name, price: parseInt(price), category, availability: product?.availability || false, addons: selectedAddons })
   }
 
   return (
@@ -183,6 +203,23 @@ function ProductForm({ product, onSubmit, onCancel, categories }) {
             {categories.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
           </SelectContent>
         </Select>
+      </div>
+      <div>
+        <Label>Complementos</Label>
+        <div className="space-y-2">
+          {availableAddons.map(addon => (
+            <div key={addon.id} className="flex items-center space-x-2">
+              <Checkbox
+                id={`addon-${addon.id}`}
+                checked={selectedAddons.includes(addon.id)}
+                onCheckedChange={() => handleAddonToggle(addon.id)}
+              />
+              <label htmlFor={`addon-${addon.id}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                {addon.name} (+${addon.price})
+              </label>
+            </div>
+          ))}
+        </div>
       </div>
       <div className="flex justify-end gap-2">
         <Button type="button" variant="ghost" onClick={onCancel}>Cancelar</Button>

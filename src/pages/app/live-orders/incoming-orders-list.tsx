@@ -9,11 +9,11 @@ interface IncomingOrdersListProps {
 
 export function IncomingOrdersList({ onSelectOrder }: IncomingOrdersListProps) {
   const { data: result, isLoading: isLoadingOrders } = useQuery({
-    queryKey: ['orders', 1, null, null, 'pending'], // Fetching pending orders for now
+    queryKey: ['orders', 1, null, null, ['pending', 'processing', 'delivering']],
     queryFn: () =>
       getOrders({
         pageIndex: 0,
-        status: 'pending',
+        status: 'pending,processing,delivering',
       }),
       refetchInterval: 5000, // Refresh every 5 seconds
   })

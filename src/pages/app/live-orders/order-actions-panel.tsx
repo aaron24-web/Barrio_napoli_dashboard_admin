@@ -6,6 +6,7 @@ import { cancelOrder } from '@/api/cancel-order'
 import { deliveryOrder } from '@/api/delivery-order'
 import { dispatchOrder } from '@/api/dispatch-order'
 import { GetOrderDetailsResponse } from '@/api/get-order-details'
+import { GetOrdersResponse } from '@/api/get-orders'
 import { Button } from '@/components/ui/button'
 
 interface OrderActionsPanelProps {
@@ -16,67 +17,58 @@ interface OrderActionsPanelProps {
 export function OrderActionsPanel({ orderId, status }: OrderActionsPanelProps) {
   const queryClient = useQueryClient()
 
+  function updateOrderStatusOnCache(orderId: string, status: OrderStatus) {
+    const ordersListCache = queryClient.getQueriesData<GetOrdersResponse>({
+      queryKey: ['orders'],
+    })
+
+    ordersListCache.forEach(([cacheKey, cacheData]) => {
+      if (!cacheData) {
+        return
+      }
+
+      queryClient.setQueryData<GetOrdersResponse>(cacheKey, {
+        ...cacheData,
+        orders: cacheData.orders.map((order) => {
+          if (order.orderId === orderId) {
+            return { ...order, status }
+          }
+
+          return order
+        }),
+      })
+    })
+  }
+
   const { mutateAsync: cancelOrderFn, isPending: isCancellingOrder } =
     useMutation({
       mutationFn: cancelOrder,
-      async onSuccess() {
-        queryClient.setQueryData<GetOrderDetailsResponse>(
-          ['order', orderId],
-          (old) => {
-            if (old) {
-              return { ...old, status: 'canceled' }
-            }
-            return old
-          },
-        )
+      async onSuccess(_, { orderId }) {
+        updateOrderStatusOnCache(orderId, 'canceled')
       },
     })
 
   const { mutateAsync: approveOrderFn, isPending: isApprovingOrder } =
     useMutation({
       mutationFn: approveOrder,
-      async onSuccess() {
-        queryClient.setQueryData<GetOrderDetailsResponse>(
-          ['order', orderId],
-          (old) => {
-            if (old) {
-              return { ...old, status: 'processing' }
-            }
-            return old
-          },
-        )
+      async onSuccess(_, { orderId }) {
+        updateOrderStatusOnCache(orderId, 'processing')
       },
     })
 
   const { mutateAsync: dispatchOrderFn, isPending: isDispatchingOrder } =
     useMutation({
       mutationFn: dispatchOrder,
-      async onSuccess() {
-        queryClient.setQueryData<GetOrderDetailsResponse>(
-          ['order', orderId],
-          (old) => {
-            if (old) {
-              return { ...old, status: 'delivering' }
-            }
-            return old
-          },
-        )
+      async onSuccess(_, { orderId }) {
+        updateOrderStatusOnCache(orderId, 'delivering')
       },
     })
 
   const { mutateAsync: deliverOrderFn, isPending: isDeliveringOrder } =
     useMutation({
       mutationFn: deliveryOrder,
-      async onSuccess() {
-        queryClient.setQueryData<GetOrderDetailsResponse>(
-          ['order', orderId],
-          (old) => {
-            if (old) {
-              return { ...old, status: 'delivered' }
-            }
-            return old
-          },
-        )
+      async onSuccess(_, { orderId }) {
+        updateOrderStatusOnCache(orderId, 'delivered')
       },
     })
 
