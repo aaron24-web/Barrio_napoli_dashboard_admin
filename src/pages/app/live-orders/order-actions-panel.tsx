@@ -54,6 +54,7 @@ export function OrderActionsPanel({ orderId, status }: OrderActionsPanelProps) {
       mutationFn: cancelOrder,
       async onSuccess(_, { orderId }) {
         updateOrderStatusOnCache(orderId, 'canceled')
+        queryClient.invalidateQueries({ queryKey: ['orders'] })
       },
     })
 
@@ -62,6 +63,7 @@ export function OrderActionsPanel({ orderId, status }: OrderActionsPanelProps) {
       mutationFn: approveOrder,
       async onSuccess(_, { orderId }) {
         updateOrderStatusOnCache(orderId, 'accepted')
+        queryClient.invalidateQueries({ queryKey: ['orders'] })
       },
     })
 
@@ -70,6 +72,7 @@ export function OrderActionsPanel({ orderId, status }: OrderActionsPanelProps) {
       mutationFn: dispatchOrder,
       async onSuccess(_, { orderId }) {
         updateOrderStatusOnCache(orderId, 'processing')
+        queryClient.invalidateQueries({ queryKey: ['orders'] })
       },
     })
 
@@ -78,6 +81,7 @@ export function OrderActionsPanel({ orderId, status }: OrderActionsPanelProps) {
       mutationFn: deliveryOrder,
       async onSuccess(_, { orderId }) {
         updateOrderStatusOnCache(orderId, 'delivering')
+        queryClient.invalidateQueries({ queryKey: ['orders'] })
       },
     })
 
@@ -86,6 +90,7 @@ export function OrderActionsPanel({ orderId, status }: OrderActionsPanelProps) {
       mutationFn: deliveryOrder, // This should be a new function to finish the order
       async onSuccess(_, { orderId }) {
         updateOrderStatusOnCache(orderId, 'delivered')
+        queryClient.invalidateQueries({ queryKey: ['orders'] })
       },
     })
 

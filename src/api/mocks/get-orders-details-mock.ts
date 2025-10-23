@@ -10,64 +10,32 @@ export const getOrderDetailsMock = http.get<
   never,
   GetOrderDetailsResponse
 >('/orders/:orderId', ({ params }) => {
-  if (params.orderId === 'order-1') {
-    return HttpResponse.json({
-      id: params.orderId,
-      customer: {
-        name: 'Aaron Tun',
-        email: 'aaron.tun@example.com',
-        phone: '9998887766',
-      },
-      status: 'pending',
-      createdAt: new Date().toISOString(),
-      totalInCents: 16000,
-      orderItems: [
-        {
-          id: 'order-item-1',
-          priceInCents: 15000,
-          product: {
-            name: 'Pizza Napolitana',
-          },
-          quantity: 1,
-        },
-        {
-          id: 'order-item-2',
-          priceInCents: 1000,
-          product: {
-            name: 'Queso Extra',
-          },
-          quantity: 1,
-        },
-      ],
-    })
-  }
-
   return HttpResponse.json({
     id: params.orderId,
     customer: {
-      name: 'John Doe',
-      email: 'johndoe@example.com',
-      phone: '123124125115',
+      name: `Customer ${params.orderId}`,
+      email: `${params.orderId}@example.com`,
+      phone: `99988877${Math.floor(Math.random() * 100)}`,
     },
     status: 'pending',
     createdAt: new Date().toISOString(),
-    totalInCents: 5000,
+    totalInCents: Math.floor(Math.random() * 10000) + 5000,
     orderItems: [
       {
-        id: 'order-item-1',
-        priceInCents: 1000,
+        id: `order-item-${params.orderId}-1`,
+        priceInCents: Math.floor(Math.random() * 5000) + 1000,
         product: {
-          name: 'Pizza Pepperoni',
+          name: `Pizza ${params.orderId}`,
         },
-        quantity: 1,
+        quantity: Math.floor(Math.random() * 3) + 1,
       },
       {
-        id: 'order-item-2',
-        priceInCents: 2000,
+        id: `order-item-${params.orderId}-2`,
+        priceInCents: Math.floor(Math.random() * 2000) + 500,
         product: {
-          name: 'Pizza Marguerita',
+          name: `Drink ${params.orderId}`,
         },
-        quantity: 2,
+        quantity: Math.floor(Math.random() * 2) + 1,
       },
     ],
   })

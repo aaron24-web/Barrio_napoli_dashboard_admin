@@ -1,23 +1,13 @@
-import { useQuery } from '@tanstack/react-query'
-import { getOrders } from '@/api/get-orders'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { OrderStatus } from '@/components/order-status'
+import { GetOrdersResponse } from '@/api/get-orders'
 
 interface IncomingOrdersListProps {
+  orders: GetOrdersResponse | undefined
   onSelectOrder: (orderId: string) => void
 }
 
-export function IncomingOrdersList({ onSelectOrder }: IncomingOrdersListProps) {
-  const { data: result, isLoading: isLoadingOrders } = useQuery({
-    queryKey: ['orders', 1, null, null, ['pending', 'processing', 'delivering']],
-    queryFn: () =>
-      getOrders({
-        pageIndex: 0,
-        status: 'pending,processing,delivering',
-      }),
-      refetchInterval: 5000, // Refresh every 5 seconds
-  })
-
+export function IncomingOrdersList({ orders, onSelectOrder }: IncomingOrdersListProps) {
   return (
     <div className="rounded-md border">
       <Table>
@@ -30,30 +20,33 @@ export function IncomingOrdersList({ onSelectOrder }: IncomingOrdersListProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {isLoadingOrders && (
+          {!orders && (
             <TableRow>
               <TableCell colSpan={4} className="text-center">
                 Cargando pedidos...
               </TableCell>
             </TableRow>
           )}
-          {result &&
-            result.orders &&
-            result.orders.map((order) => (
-            <TableRow key={order.orderId} onClick={() => onSelectOrder(order.orderId)} className="cursor-pointer">
-              <TableCell></TableCell>
-              <TableCell className="font-mono text-xs font-medium">
-                {order.orderId}
-              </TableCell>
-              <TableCell className="text-muted-foreground">
-                {order.customerName}
-              </TableCell>
-              <TableCell>
-                <OrderStatus status={order.status} />
-              </TableCell>
-            </TableRow>
-          ))}
-          {!isLoadingOrders && result?.orders.length === 0 && (
+          {orders &&
+            orders.orders.map((order) => (
+              <TableRow
+                key={order.orderId}
+                onClick={() => onSelectOrder(order.orderId)}
+                className="cursor-pointer"
+              >
+                <TableCell></TableCell>
+                <TableCell className="font-mono text-xs font-medium">
+                  {order.orderId}
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {order.customerName}
+                </TableCell>
+                <TableCell>
+                  <OrderStatus status={order.status} />
+                </TableCell>
+              </TableRow>
+            ))}
+          {orders && orders.orders.length === 0 && (
             <TableRow>
               <TableCell colSpan={4} className="text-center">
                 No hay pedidos entrantes.

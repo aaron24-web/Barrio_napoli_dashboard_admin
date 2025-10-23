@@ -1,15 +1,8 @@
-import { useQuery } from '@tanstack/react-query'
 import { formatDistanceToNow } from 'date-fns'
 import { es } from 'date-fns/locale'
 
-import { getOrderDetails } from '@/api/get-order-details'
+import { GetOrderDetailsResponse } from '@/api/get-order-details'
 import { OrderStatus } from '@/components/order-status'
-import {
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
 import {
   Table,
   TableBody,
@@ -23,24 +16,13 @@ import {
 import { OrderDetailsSkeleton } from './order-details-skeleton'
 
 export interface OrderDetailsProps {
-  orderId: string
-  open: boolean
+  order: GetOrderDetailsResponse
 }
 
-export function OrderDetails({ orderId, open }: OrderDetailsProps) {
-  const { data: order } = useQuery({
-    queryKey: ['order', orderId],
-    queryFn: () => getOrderDetails({ orderId }),
-    enabled: open,
-  })
-
+export function OrderDetails({ order }: OrderDetailsProps) {
   return (
-    <DialogContent>
-      <DialogHeader>
-        <DialogTitle>Pedido: {orderId}</DialogTitle>
-        <DialogDescription>Detalles del pedido</DialogDescription>
-      </DialogHeader>
-
+    <div className="space-y-6">
+      <h2 className="text-lg font-semibold">Pedido: {order.id}</h2>
       {order ? (
         <div className="space-y-6">
           <Table>
@@ -138,6 +120,6 @@ export function OrderDetails({ orderId, open }: OrderDetailsProps) {
       ) : (
         <OrderDetailsSkeleton />
       )}
-    </DialogContent>
+    </div>
   )
 }
