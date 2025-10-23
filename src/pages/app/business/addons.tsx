@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label'
 import { useState, useEffect } from 'react'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Pagination } from '@/components/pagination'
 
 const initialAddons = [
   { id: 1, name: 'Queso Extra', price: 10, availability: true, category: 'Pizzas' },
@@ -29,10 +30,20 @@ export function Addons() {
   })
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingAddon, setEditingAddon] = useState<any | null>(null)
+  const [search, setSearch] = useState('')
+  const [availabilityFilter, setAvailabilityFilter] = useState('all')
+  const [page, setPage] = useState(1)
+  const addonsPerPage = 10
 
   useEffect(() => {
     localStorage.setItem('addons', JSON.stringify(addons))
   }, [addons])
+
+  const filteredAddons = addons
+    .filter(a => a.name.toLowerCase().includes(search.toLowerCase()))
+    .filter(a => availabilityFilter === 'all' || (availabilityFilter === 'available' && a.availability) || (availabilityFilter === 'unavailable' && !a.availability))
+
+  const paginatedAddons = filteredAddons.slice((page - 1) * addonsPerPage, page * addonsPerPage)
 
   function handleCreateAddon(newAddon: any) {
     setAddons([...addons, { ...newAddon, id: addons.length + 1 }])
@@ -76,6 +87,19 @@ export function Addons() {
             </DialogContent>
           </Dialog>
         </div>
+        <div className="flex items-center gap-2">
+          <Input placeholder="Buscar complementos..." value={search} onChange={e => setSearch(e.target.value)} />
+          <Select value={availabilityFilter} onValueChange={setAvailabilityFilter}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos</SelectItem>
+              <SelectItem value="available">Disponibles</SelectItem>
+              <SelectItem value="unavailable">No Disponibles</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
         <div className="rounded-md border">
           <Table>
             <TableHeader>
@@ -88,7 +112,7 @@ export function Addons() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {addons.map((addon) => (
+              {paginatedAddons.map((addon) => (
                 <TableRow key={addon.id}>
                   <TableCell>{addon.name}</TableCell>
                   <TableCell>${addon.price}</TableCell>
@@ -124,6 +148,12 @@ export function Addons() {
             </TableBody>
           </Table>
         </div>
+        <Pagination
+          pageIndex={page - 1}
+          totalCount={filteredAddons.length}
+          perPage={addonsPerPage}
+          onPageChange={(page) => setPage(page + 1)}
+        />
       </div>
     </>
   )
