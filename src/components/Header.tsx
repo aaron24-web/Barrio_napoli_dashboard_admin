@@ -1,4 +1,4 @@
-import { Home, UtensilsCrossed, Cog, Briefcase } from 'lucide-react'
+import { Home, UtensilsCrossed, Cog, Briefcase, BarChart } from 'lucide-react'
 
 import { AccountMenu } from './account-menu'
 import { NavLink } from './nav-link'
@@ -29,6 +29,10 @@ export function Header() {
           <NavLink to="/settings">
             <Cog className="h-4 w-4" />
             Configuración
+          </NavLink>
+          <NavLink to="/reports">
+            <BarChart className="h-4 w-4" />
+            Reportes
           </NavLink>
         </nav>
 

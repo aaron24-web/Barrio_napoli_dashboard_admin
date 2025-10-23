@@ -9,12 +9,13 @@ import { registerRestaurantIn } from '@/api/register-restaurant'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { zodResolver } from '@hookform/resolvers/zod'
 
 const signUpForm = z.object({
-  restaurantName: z.string(),
-  managerName: z.string(),
-  phone: z.string(),
-  email: z.string().email(),
+  restaurantName: z.string().min(1, 'El nombre del restaurante es obligatorio'),
+  managerName: z.string().min(1, 'Tu nombre es obligatorio'),
+  phone: z.string().min(1, 'El teléfono es obligatorio'),
+  email: z.string().email('E-mail inválido'),
 })
 
 type SignUpForm = z.infer<typeof signUpForm>
@@ -25,8 +26,10 @@ export function SignUp() {
   const {
     register,
     handleSubmit,
-    formState: { isSubmitting },
-  } = useForm<SignUpForm>()
+    formState: { isSubmitting, errors },
+  } = useForm<SignUpForm>({
+    resolver: zodResolver(signUpForm),
+  })
 
   const { mutateAsync: registerRestaurantFn } = useMutation({
     mutationFn: registerRestaurantIn,
@@ -77,6 +80,11 @@ export function SignUp() {
                 type="text"
                 {...register('restaurantName')}
               />
+              {errors.restaurantName && (
+                <p className="text-sm text-red-500">
+                  {errors.restaurantName.message}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -86,16 +94,27 @@ export function SignUp() {
                 type="text"
                 {...register('managerName')}
               />
+              {errors.managerName && (
+                <p className="text-sm text-red-500">
+                  {errors.managerName.message}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="email">Tu correo electrónico</Label>
               <Input id="email" type="email" {...register('email')} />
+              {errors.email && (
+                <p className="text-sm text-red-500">{errors.email.message}</p>
+              )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="phone">Tu teléfono móvil</Label>
               <Input id="phone" type="tel" {...register('phone')} />
+              {errors.phone && (
+                <p className="text-sm text-red-500">{errors.phone.message}</p>
+              )}
             </div>
 
             <Button disabled={isSubmitting} className="w-full" type="submit">

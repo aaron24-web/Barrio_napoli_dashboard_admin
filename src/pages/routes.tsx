@@ -10,6 +10,8 @@ import { Categories } from './app/business/categories'
 import { Addons } from './app/business/addons'
 import { Promotions } from './app/business/promotions'
 import { Settings } from './app/settings/settings'
+import { Reports } from './app/reports/reports'
+import { SalesReportDetail } from './app/reports/sales-report-detail'
 import { SignIn } from './auth/sign-in'
 import { SignUp } from './auth/sign-up'
 import { Error } from './error'
@@ -27,6 +29,8 @@ export const router = createBrowserRouter([
       { path: '/business/addons', element: <Addons /> },
       { path: '/business/promotions', element: <Promotions /> },
       { path: '/settings', element: <Settings /> },
+      { path: '/reports', element: <Reports /> },
+      { path: '/reports/sales', element: <SalesReportDetail /> },
     ],
   },
   {

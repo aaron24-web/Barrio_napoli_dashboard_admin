@@ -15,6 +15,7 @@ import { getMonthRevenueMock } from './get-month-revenue-mock'
 import { getOrderDetailsMock } from './get-orders-details-mock'
 import { getOrdersMock } from './get-orders-mock'
 import { getPopularProductsMock } from './get-popular-products-mock'
+import { getSalesTransactionsMock } from './get-sales-transactions-mock'
 import { getProfileMock } from './get-profile-mock'
 import { registerRestaurantMock } from './register-restaurant-mock'
 import { signInMock } from './sign-in-mock'
@@ -29,6 +30,7 @@ export const worker = setupWorker(
   getMonthRevenueMock,
   getDailyRevenueInPeriodMock,
   getPopularProductsMock,
+  getSalesTransactionsMock,
   getProfileMock,
   getManagedRestaurantMock,
   updateProfileMock,
