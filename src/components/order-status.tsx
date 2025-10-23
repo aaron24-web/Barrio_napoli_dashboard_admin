@@ -1,5 +1,6 @@
 export type OrderStatus =
   | 'pending'
+  | 'accepted'
   | 'canceled'
   | 'processing'
   | 'delivering'
@@ -11,10 +12,20 @@ interface OrderStatusProps {
 
 const orderStatusMap: Record<OrderStatus, string> = {
   pending: 'Pendiente',
-  canceled: 'Cancelado',
-  delivered: 'Entregado',
-  delivering: 'En reparto',
+  accepted: 'Aceptado',
   processing: 'En preparación',
+  delivering: 'En reparto',
+  delivered: 'Entregado',
+  canceled: 'Cancelado',
+}
+
+const orderStatusColorMap: Record<OrderStatus, string> = {
+  pending: 'bg-slate-400',
+  accepted: 'bg-blue-500',
+  processing: 'bg-amber-500',
+  delivering: 'bg-amber-500',
+  delivered: 'bg-emerald-500',
+  canceled: 'bg-rose-500',
 }
 
 export function OrderStatus({ status }: OrderStatusProps) {

@@ -8,6 +8,7 @@ type OrderStatus = GetOrdersResponse['orders'][number]['status']
 
 const statuses: OrderStatus[] = [
   'pending',
+  'accepted',
   'processing',
   'canceled',
   'delivered',

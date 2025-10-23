@@ -6,12 +6,12 @@ import { cancelOrder } from '@/api/cancel-order'
 import { deliveryOrder } from '@/api/delivery-order'
 import { dispatchOrder } from '@/api/dispatch-order'
 import { GetOrderDetailsResponse } from '@/api/get-order-details'
-import { GetOrdersResponse } from '@/api/get-orders'
+import { GetOrdersResponse, OrderStatus } from '@/api/get-orders'
 import { Button } from '@/components/ui/button'
 
 interface OrderActionsPanelProps {
   orderId: string
-  status: 'pending' | 'canceled' | 'processing' | 'delivering' | 'delivered'
+  status: OrderStatus
 }
 
 export function OrderActionsPanel({ orderId, status }: OrderActionsPanelProps) {
@@ -38,6 +38,15 @@ export function OrderActionsPanel({ orderId, status }: OrderActionsPanelProps) {
         }),
       })
     })
+
+    const orderDetailsCache = queryClient.getQueryData<GetOrderDetailsResponse>(['order', orderId])
+
+    if (orderDetailsCache) {
+      queryClient.setQueryData<GetOrderDetailsResponse>(['order', orderId], {
+        ...orderDetailsCache,
+        status,
+      })
+    }
   }
 
   const { mutateAsync: cancelOrderFn, isPending: isCancellingOrder } =
@@ -52,7 +61,7 @@ export function OrderActionsPanel({ orderId, status }: OrderActionsPanelProps) {
     useMutation({
       mutationFn: approveOrder,
       async onSuccess(_, { orderId }) {
-        updateOrderStatusOnCache(orderId, 'processing')
+        updateOrderStatusOnCache(orderId, 'accepted')
       },
     })
 
@@ -60,13 +69,21 @@ export function OrderActionsPanel({ orderId, status }: OrderActionsPanelProps) {
     useMutation({
       mutationFn: dispatchOrder,
       async onSuccess(_, { orderId }) {
-        updateOrderStatusOnCache(orderId, 'delivering')
+        updateOrderStatusOnCache(orderId, 'processing')
       },
     })
 
   const { mutateAsync: deliverOrderFn, isPending: isDeliveringOrder } =
     useMutation({
       mutationFn: deliveryOrder,
+      async onSuccess(_, { orderId }) {
+        updateOrderStatusOnCache(orderId, 'delivering')
+      },
+    })
+
+  const { mutateAsync: finishOrderFn, isPending: isFinishingOrder } =
+    useMutation({
+      mutationFn: deliveryOrder, // This should be a new function to finish the order
       async onSuccess(_, { orderId }) {
         updateOrderStatusOnCache(orderId, 'delivered')
       },
@@ -86,7 +103,7 @@ export function OrderActionsPanel({ orderId, status }: OrderActionsPanelProps) {
         </Button>
       )}
 
-      {status === 'processing' && (
+      {status === 'accepted' && (
         <Button
           onClick={() => dispatchOrderFn({ orderId })}
           disabled={isDispatchingOrder}
@@ -94,11 +111,11 @@ export function OrderActionsPanel({ orderId, status }: OrderActionsPanelProps) {
           size="xs"
         >
           <ArrowRight className="mr-2 h-3 w-3" />
-          Marcar como en Proceso
+          En Proceso
         </Button>
       )}
 
-      {status === 'delivering' && (
+      {status === 'processing' && (
         <Button
           onClick={() => deliverOrderFn({ orderId })}
           disabled={isDeliveringOrder}
@@ -106,20 +123,32 @@ export function OrderActionsPanel({ orderId, status }: OrderActionsPanelProps) {
           size="xs"
         >
           <ArrowRight className="mr-2 h-3 w-3" />
-          Marcar como Finalizado
+          En Reparto
+        </Button>
+      )}
+
+      {status === 'delivering' && (
+        <Button
+          onClick={() => finishOrderFn({ orderId })}
+          disabled={isFinishingOrder}
+          variant="outline"
+          size="xs"
+        >
+          <ArrowRight className="mr-2 h-3 w-3" />
+          Finalizado
         </Button>
       )}
 
       <Button
         disabled={
-          !['pending', 'processing'].includes(status) || isCancellingOrder
+          !['pending', 'accepted', 'processing'].includes(status) || isCancellingOrder
         }
         onClick={() => cancelOrderFn({ orderId })}
         variant="ghost"
         size="xs"
       >
         <X className="mr-2 h-3 w-3" />
-        Cancelar Pedido
+        Rechazar Pedido
       </Button>
     </div>
   )
