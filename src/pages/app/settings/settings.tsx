@@ -2,6 +2,7 @@
 import { Helmet } from 'react-helmet-async'
 import { ShippingSettings } from './shipping-settings'
 import { BillingSettings } from './billing-settings'
+import { OperatingHoursSettings } from './operating-hours-settings'
 
 export function Settings() {
   return (
@@ -13,6 +14,7 @@ export function Settings() {
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <ShippingSettings />
           <BillingSettings />
+          <OperatingHoursSettings />
         </div>
       </div>
     </>
