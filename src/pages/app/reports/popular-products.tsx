@@ -1,14 +1,71 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
+import { DateRange } from 'react-day-picker'
+import { subDays } from 'date-fns'
+import {
+  BarChart,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Bar,
+  ResponsiveContainer,
+  Tooltip,
+} from 'recharts'
+
+import { getPopularProducts } from '@/api/get-popular-products'
+import { DateRangePicker } from '@/components/ui/date-range-picker'
 
 export function PopularProducts() {
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: subDays(new Date(), 7),
+    to: new Date(),
+  })
+
+  const { data: popularProducts } = useQuery({
+    queryKey: ['metrics', 'popular-products', dateRange],
+    queryFn: () => getPopularProducts(), // Assuming getPopularProducts can take date range params if needed
+  })
+
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Productos Más Vendidos</CardTitle>
+      <CardHeader className="flex-row items-center justify-between pb-8">
+        <div className="space-y-1">
+          <CardTitle className="text-base font-medium">
+            Productos Más Vendidos
+          </CardTitle>
+        </div>
+        <DateRangePicker date={dateRange} onDateChange={setDateRange} />
       </CardHeader>
       <CardContent>
-        {/* List or table for popular products */}
-        <p>Aquí irá la lista de productos más vendidos.</p>
+        {popularProducts && Array.isArray(popularProducts) ? (
+          <ResponsiveContainer width="100%" height={240}>
+            <BarChart data={popularProducts} style={{ fontSize: 12 }}>
+              <XAxis
+                dataKey="product"
+                stroke="#888888"
+                axisLine={false}
+                tickLine={false}
+                dy={16}
+              />
+              <YAxis
+                stroke="#888888"
+                axisLine={false}
+                tickLine={false}
+                width={80}
+              />
+              <CartesianGrid vertical={false} className="stroke-muted" />
+              <Bar dataKey="amount" fill="#f7a000" />
+              <Tooltip />
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="flex h-60 items-center justify-center">
+            <p className="text-muted-foreground">
+              Cargando productos más vendidos...
+            </p>
+          </div>
+        )}
       </CardContent>
     </Card>
   )

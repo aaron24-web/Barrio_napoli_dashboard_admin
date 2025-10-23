@@ -39,6 +39,7 @@ export function SalesReportDetail() {
         from: dateRange?.from,
         to: dateRange?.to,
       }),
+    enabled: !!dateRange?.from && !!dateRange?.to,
   })
 
   const { data: salesTransactions } = useQuery({
