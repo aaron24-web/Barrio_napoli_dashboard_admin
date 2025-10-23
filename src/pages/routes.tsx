@@ -9,6 +9,7 @@ import { Products } from './app/business/products'
 import { Categories } from './app/business/categories'
 import { Addons } from './app/business/addons'
 import { Promotions } from './app/business/promotions'
+import { Settings } from './app/settings/settings'
 import { SignIn } from './auth/sign-in'
 import { SignUp } from './auth/sign-up'
 import { Error } from './error'
@@ -25,6 +26,7 @@ export const router = createBrowserRouter([
       { path: '/business/categories', element: <Categories /> },
       { path: '/business/addons', element: <Addons /> },
       { path: '/business/promotions', element: <Promotions /> },
+      { path: '/settings', element: <Settings /> },
     ],
   },
   {

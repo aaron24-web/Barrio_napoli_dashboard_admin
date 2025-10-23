@@ -5,14 +5,8 @@ import { registerRestaurantInBody } from '../register-restaurant'
 export const registerRestaurantMock = http.post<
   never,
   registerRestaurantInBody
->('/restaurants', async ({ request }) => {
-  const { restaurantName } = await request.json()
-
-  if (restaurantName === 'Barrio Napoli') {
-    return new HttpResponse(null, {
-      status: 200,
-    })
-  }
-
-  return new HttpResponse(null, { status: 400 })
+>('/restaurants', async () => {
+  return new HttpResponse(null, {
+    status: 200,
+  })
 })

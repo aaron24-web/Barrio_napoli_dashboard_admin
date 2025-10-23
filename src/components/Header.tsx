@@ -1,4 +1,4 @@
-import { Home, UtensilsCrossed } from 'lucide-react'
+import { Home, UtensilsCrossed, Cog, Briefcase } from 'lucide-react'
 
 import { AccountMenu } from './account-menu'
 import { NavLink } from './nav-link'
@@ -20,7 +20,15 @@ export function Header() {
           </NavLink>
           <NavLink to="/orders">
             <UtensilsCrossed className="h-4 w-4" />
-            Gestión del menú
+            Pedidos
+          </NavLink>
+          <NavLink to="/business/products">
+            <Briefcase className="h-4 w-4" />
+            Negocio
+          </NavLink>
+          <NavLink to="/settings">
+            <Cog className="h-4 w-4" />
+            Configuración
           </NavLink>
         </nav>
 

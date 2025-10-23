@@ -37,7 +37,9 @@ export function IncomingOrdersList({ onSelectOrder }: IncomingOrdersListProps) {
               </TableCell>
             </TableRow>
           )}
-          {result && result.orders.map((order) => (
+          {result &&
+            result.orders &&
+            result.orders.map((order) => (
             <TableRow key={order.orderId} onClick={() => onSelectOrder(order.orderId)} className="cursor-pointer">
               <TableCell></TableCell>
               <TableCell className="font-mono text-xs font-medium">

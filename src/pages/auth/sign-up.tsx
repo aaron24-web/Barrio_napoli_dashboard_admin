@@ -41,12 +41,9 @@ export function SignUp() {
         phone: data.phone,
       })
 
-      toast.success('Restaurante registrado con éxito', {
-        action: {
-          label: 'Iniciar sesión',
-          onClick: () => navigate(`/sign-in?email=${data.email}`),
-        },
-      })
+      toast.success('Restaurante registrado con éxito')
+
+      navigate(`/sign-in?email=${data.email}`)
     } catch {
       toast.error('Error al registrar el restaurante')
     }
