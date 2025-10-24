@@ -1,12 +1,12 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { Building, ChevronDown, LogOut } from 'lucide-react'
+import { User, ChevronDown, LogOut } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 import { getManagedRestaurant } from '@/api/get-manage-restaurant'
 import { getProfile } from '@/api/get-profile'
 import { signOut } from '@/api/sign-out'
 
-import { StoreProfileDialog } from './store-profile-dialog'
+import { AdminProfileDialog } from './admin-profile-dialog'
 import { Button } from './ui/button'
 import { Dialog, DialogTrigger } from './ui/dialog'
 import {
@@ -77,8 +77,8 @@ export function AccountMenu() {
           <DropdownMenuSeparator />
           <DialogTrigger asChild>
             <DropdownMenuItem>
-              <Building className="mr-2 h-4 w-4" />
-              <span>Perfil de la tienda</span>
+              <User className="mr-2 h-4 w-4" />
+              <span>Perfil del administrador</span>
             </DropdownMenuItem>
           </DialogTrigger>
           <DropdownMenuItem
@@ -94,7 +94,7 @@ export function AccountMenu() {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <StoreProfileDialog />
+      <AdminProfileDialog />
     </Dialog>
   )
 }

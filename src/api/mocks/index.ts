@@ -20,6 +20,7 @@ import { getProfileMock } from './get-profile-mock'
 import { registerRestaurantMock } from './register-restaurant-mock'
 import { signInMock } from './sign-in-mock'
 import { updateProfileMock } from './update-profile-mock'
+import { changePasswordMock } from './change-password-mock'
 
 export const worker = setupWorker(
   signInMock,
@@ -40,6 +41,7 @@ export const worker = setupWorker(
   approveOrderMock,
   deliverOrderMock,
   dispatchOrderMock,
+  changePasswordMock,
 )
 
 export async function enableMSW() {
