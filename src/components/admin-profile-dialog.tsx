@@ -1,4 +1,9 @@
-import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { ProfileSettings } from '@/pages/app/settings/profile-settings'
 
 export function AdminProfileDialog() {

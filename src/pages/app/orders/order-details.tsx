@@ -1,8 +1,22 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { formatDistanceToNow } from 'date-fns'
 import { es } from 'date-fns/locale'
+import { Controller, useForm } from 'react-hook-form'
+import { z } from 'zod'
 
+import { assignDeliveryMan } from '@/api/assign-delivery-man'
+import { getDeliveryMen } from '@/api/get-delivery-men'
 import { GetOrderDetailsResponse } from '@/api/get-order-details'
 import { OrderStatus } from '@/components/order-status'
+import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import {
   Table,
   TableBody,
@@ -12,6 +26,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { queryClient } from '@/lib/react-query'
 
 import { OrderDetailsSkeleton } from './order-details-skeleton'
 
@@ -19,7 +34,52 @@ export interface OrderDetailsProps {
   order: GetOrderDetailsResponse
 }
 
+const assignDeliveryManSchema = z.object({
+  deliveryManId: z.string().nullable(),
+})
+
+type AssignDeliveryManSchema = z.infer<typeof assignDeliveryManSchema>
+
 export function OrderDetails({ order }: OrderDetailsProps) {
+  const { data: deliveryMen } = useQuery({
+    queryKey: ['delivery-men'],
+    queryFn: getDeliveryMen,
+  })
+
+  const {
+    handleSubmit,
+    control,
+    formState: { isSubmitting },
+  } = useForm<AssignDeliveryManSchema>({
+    resolver: zodResolver(assignDeliveryManSchema),
+    defaultValues: {
+      deliveryManId: order.deliveryMan?.id ?? null,
+    },
+  })
+
+  const { mutateAsync: assignDeliveryManFn } = useMutation({
+    mutationFn: assignDeliveryMan,
+    async onSuccess(_, { orderId }) {
+      queryClient.invalidateQueries({
+        queryKey: ['orders'],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['order-details', orderId],
+      })
+    },
+  })
+
+  async function handleAssignDeliveryMan(data: AssignDeliveryManSchema) {
+    if (!data.deliveryManId) {
+      return
+    }
+
+    await assignDeliveryManFn({
+      orderId: order.id,
+      deliveryManId: data.deliveryManId,
+    })
+  }
+
   return (
     <div className="space-y-6">
       <h2 className="text-lg font-semibold">Pedido: {order.id}</h2>
@@ -48,7 +108,9 @@ export function OrderDetails({ order }: OrderDetailsProps) {
                 </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell className="text-muted-foreground">Correo electrónico</TableCell>
+                <TableCell className="text-muted-foreground">
+                  Correo electrónico
+                </TableCell>
                 <TableCell className="flex justify-end">
                   {order.customer.email}
                 </TableCell>
@@ -66,6 +128,45 @@ export function OrderDetails({ order }: OrderDetailsProps) {
               </TableRow>
             </TableBody>
           </Table>
+
+          {['accepted', 'processing', 'delivering'].includes(order.status) && (
+            <form onSubmit={handleSubmit(handleAssignDeliveryMan)}>
+              <div className="space-y-3">
+                <h2 className="text-lg font-semibold">
+                  Asignación de repartidor
+                </h2>
+                <div className="flex items-center gap-2">
+                  <Controller
+                    name="deliveryManId"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value ?? ''}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccionar repartidor..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {deliveryMen?.deliveryMen.map((deliveryMan) => (
+                            <SelectItem
+                              key={deliveryMan.id}
+                              value={deliveryMan.id}
+                            >
+                              {deliveryMan.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  <Button type="submit" disabled={isSubmitting}>
+                    Asignar repartidor
+                  </Button>
+                </div>
+              </div>
+            </form>
+          )}
 
           <Table>
             <TableHeader>

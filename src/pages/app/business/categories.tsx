@@ -1,11 +1,35 @@
+import { useEffect, useState } from 'react'
 import { Helmet } from 'react-helmet-async'
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useState, useEffect } from 'react'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 
 const initialCategories = [
   { id: 1, name: 'Pizzas' },
@@ -26,18 +50,25 @@ export function Categories() {
   }, [categories])
 
   function handleCreateCategory(newCategory: any) {
-    setCategories([...categories, { ...newCategory, id: categories.length + 1 }])
+    setCategories([
+      ...categories,
+      { ...newCategory, id: categories.length + 1 },
+    ])
     setIsDialogOpen(false)
   }
 
   function handleUpdateCategory(updatedCategory: any) {
-    setCategories(categories.map(c => c.id === updatedCategory.id ? updatedCategory : c))
+    setCategories(
+      categories.map((c) =>
+        c.id === updatedCategory.id ? updatedCategory : c,
+      ),
+    )
     setEditingCategory(null)
     setIsDialogOpen(false)
   }
 
   function handleDeleteCategory(id: number) {
-    setCategories(categories.filter(c => c.id !== id))
+    setCategories(categories.filter((c) => c.id !== id))
   }
 
   return (
@@ -45,18 +76,26 @@ export function Categories() {
       <Helmet title="Categorías" />
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold tracking-tight">Gestión de Categorías</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Gestión de Categorías
+          </h1>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button onClick={() => setEditingCategory(null)}>Crear Categoría</Button>
+              <Button onClick={() => setEditingCategory(null)}>
+                Crear Categoría
+              </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>{editingCategory ? 'Editar Categoría' : 'Crear Categoría'}</DialogTitle>
+                <DialogTitle>
+                  {editingCategory ? 'Editar Categoría' : 'Crear Categoría'}
+                </DialogTitle>
               </DialogHeader>
               <CategoryForm
                 category={editingCategory}
-                onSubmit={editingCategory ? handleUpdateCategory : handleCreateCategory}
+                onSubmit={
+                  editingCategory ? handleUpdateCategory : handleCreateCategory
+                }
                 onCancel={() => setIsDialogOpen(false)}
               />
             </DialogContent>
@@ -75,21 +114,38 @@ export function Categories() {
                 <TableRow key={category.id}>
                   <TableCell>{category.name}</TableCell>
                   <TableCell>
-                    <Button variant="outline" size="sm" className="mr-2" onClick={() => { setEditingCategory(category); setIsDialogOpen(true); }}>Editar</Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="mr-2"
+                      onClick={() => {
+                        setEditingCategory(category)
+                        setIsDialogOpen(true)
+                      }}
+                    >
+                      Editar
+                    </Button>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Button variant="destructive" size="sm">Eliminar</Button>
+                        <Button variant="destructive" size="sm">
+                          Eliminar
+                        </Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
                           <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
                           <AlertDialogDescription>
-                            Esta acción no se puede deshacer. La categoría se eliminará permanentemente.
+                            Esta acción no se puede deshacer. La categoría se
+                            eliminará permanentemente.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                           <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => handleDeleteCategory(category.id)}>Eliminar</AlertDialogAction>
+                          <AlertDialogAction
+                            onClick={() => handleDeleteCategory(category.id)}
+                          >
+                            Eliminar
+                          </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>
                     </AlertDialog>
@@ -116,10 +172,16 @@ function CategoryForm({ category, onSubmit, onCancel }) {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <Label htmlFor="name">Nombre</Label>
-        <Input id="name" value={name} onChange={(e) => setName(e.target.value)} />
+        <Input
+          id="name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
       </div>
       <div className="flex justify-end gap-2">
-        <Button type="button" variant="ghost" onClick={onCancel}>Cancelar</Button>
+        <Button type="button" variant="ghost" onClick={onCancel}>
+          Cancelar
+        </Button>
         <Button type="submit">Guardar</Button>
       </div>
     </form>

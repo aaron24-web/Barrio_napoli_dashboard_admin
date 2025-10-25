@@ -11,7 +11,13 @@ export interface GetOrdersResponse {
   orders: {
     orderId: string
     createdAt: string
-    status: 'pending' | 'accepted' | 'canceled' | 'processing' | 'delivering' | 'delivered'
+    status:
+      | 'pending'
+      | 'accepted'
+      | 'canceled'
+      | 'processing'
+      | 'delivering'
+      | 'delivered'
     customerName: string
     total: number
   }[]

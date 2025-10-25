@@ -1,5 +1,7 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Bike } from 'lucide-react'
+
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+
 import { DeliveryPerson } from '../dashboard/dashboard'
 
 interface DeliveryMapProps {
@@ -44,19 +46,22 @@ export function DeliveryMap({ onSelectDeliveryPerson }: DeliveryMapProps) {
             className="h-full w-full object-cover"
           />
           <div
-            className="absolute cursor-pointer" style={{ top: '10%', left: '20%' }}
+            className="absolute cursor-pointer"
+            style={{ top: '10%', left: '20%' }}
             onClick={() => onSelectDeliveryPerson(deliveryPeople[0])}
           >
             <Bike className="h-6 w-6 text-blue-500" />
           </div>
           <div
-            className="absolute cursor-pointer" style={{ top: '50%', left: '60%' }}
+            className="absolute cursor-pointer"
+            style={{ top: '50%', left: '60%' }}
             onClick={() => onSelectDeliveryPerson(deliveryPeople[1])}
           >
             <Bike className="h-6 w-6 text-red-500" />
           </div>
           <div
-            className="absolute cursor-pointer" style={{ top: '80%', left: '30%' }}
+            className="absolute cursor-pointer"
+            style={{ top: '80%', left: '30%' }}
             onClick={() => onSelectDeliveryPerson(deliveryPeople[2])}
           >
             <Bike className="h-6 w-6 text-green-500" />

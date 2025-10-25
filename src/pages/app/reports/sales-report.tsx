@@ -1,12 +1,13 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useNavigate } from 'react-router-dom'
+
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export function SalesReport() {
   const navigate = useNavigate()
 
   // Simulated data
   const dailyRevenue = 1250.75
-  const weeklyRevenue = 8500.50
+  const weeklyRevenue = 8500.5
   const monthlyRevenue = 32100.25
 
   return (
@@ -18,19 +19,28 @@ export function SalesReport() {
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">Ventas del día:</p>
           <p className="text-lg font-bold">
-            {dailyRevenue.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })}
+            {dailyRevenue.toLocaleString('es-MX', {
+              style: 'currency',
+              currency: 'MXN',
+            })}
           </p>
         </div>
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">Ventas de la semana:</p>
           <p className="text-lg font-bold">
-            {weeklyRevenue.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })}
+            {weeklyRevenue.toLocaleString('es-MX', {
+              style: 'currency',
+              currency: 'MXN',
+            })}
           </p>
         </div>
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">Ventas del mes:</p>
           <p className="text-lg font-bold">
-            {monthlyRevenue.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })}
+            {monthlyRevenue.toLocaleString('es-MX', {
+              style: 'currency',
+              currency: 'MXN',
+            })}
           </p>
         </div>
       </CardContent>

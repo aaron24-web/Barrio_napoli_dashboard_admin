@@ -1,10 +1,20 @@
-import * as React from "react"
-import { Check, ChevronsUpDown } from "lucide-react"
+import { Check, ChevronsUpDown } from 'lucide-react'
+import * as React from 'react'
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Button } from '@/components/ui/button'
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from '@/components/ui/command'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import { cn } from '@/lib/utils'
 
 export interface MultiSelectOption {
   value: string
@@ -18,7 +28,12 @@ interface MultiSelectProps {
   className?: string
 }
 
-export function MultiSelect({ options, selected, onChange, className }: MultiSelectProps) {
+export function MultiSelect({
+  options,
+  selected,
+  onChange,
+  className,
+}: MultiSelectProps) {
   const [open, setOpen] = React.useState(false)
 
   return (
@@ -28,14 +43,17 @@ export function MultiSelect({ options, selected, onChange, className }: MultiSel
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className={cn("w-full justify-between", className)}
+          className={cn('w-full justify-between', className)}
         >
           <span className="truncate">
             {selected.length > 0
               ? selected
-                  .map((value) => options.find((option) => option.value === value)?.label)
-                  .join(", ")
-              : "Select options"}
+                  .map(
+                    (value) =>
+                      options.find((option) => option.value === value)?.label,
+                  )
+                  .join(', ')
+              : 'Select options'}
           </span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -58,8 +76,10 @@ export function MultiSelect({ options, selected, onChange, className }: MultiSel
               >
                 <Check
                   className={cn(
-                    "mr-2 h-4 w-4",
-                    selected.includes(option.value) ? "opacity-100" : "opacity-0"
+                    'mr-2 h-4 w-4',
+                    selected.includes(option.value)
+                      ? 'opacity-100'
+                      : 'opacity-0',
                   )}
                 />
                 {option.label}

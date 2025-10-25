@@ -1,22 +1,22 @@
-import { Helmet } from 'react-helmet-async'
 import { useQuery } from '@tanstack/react-query'
+import { subDays } from 'date-fns'
 import { useState } from 'react'
 import { DateRange } from 'react-day-picker'
-import { subDays } from 'date-fns'
+import { Helmet } from 'react-helmet-async'
 import {
   CartesianGrid,
   Line,
   LineChart,
   ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  Tooltip,
 } from 'recharts'
 
 import { getDailyRevenueAmount } from '@/api/get-daily-revenue-in-period'
 import { getSalesTransactions } from '@/api/get-sales-transactions'
-import { DateRangePicker } from '@/components/ui/date-range-picker'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { DateRangePicker } from '@/components/ui/date-range-picker'
 import {
   Table,
   TableBody,
@@ -148,18 +148,15 @@ export function SalesReportDetail() {
                         })}
                       </TableCell>
                       <TableCell>
-                        {
-                          transaction.items.map((item, index) => (
-                            <div key={index}>
-                              {item.product} (x{item.quantity}) - {
-                                item.price.toLocaleString('es-MX', {
-                                  style: 'currency',
-                                  currency: 'MXN',
-                                })
-                              }
-                            </div>
-                          ))
-                        }
+                        {transaction.items.map((item, index) => (
+                          <div key={index}>
+                            {item.product} (x{item.quantity}) -{' '}
+                            {item.price.toLocaleString('es-MX', {
+                              style: 'currency',
+                              currency: 'MXN',
+                            })}
+                          </div>
+                        ))}
                       </TableCell>
                     </TableRow>
                   ))}

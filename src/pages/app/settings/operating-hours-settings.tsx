@@ -1,8 +1,15 @@
 import { useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 export function OperatingHoursSettings() {
   const daysOfWeek = [
@@ -13,18 +20,18 @@ export function OperatingHoursSettings() {
     'Jueves',
     'Viernes',
     'Sábado',
-  ];
+  ]
 
   const [dayEnabled, setDayEnabled] = useState<Record<string, boolean>>(
-    daysOfWeek.reduce((acc, day) => ({ ...acc, [day]: true }), {})
-  );
+    daysOfWeek.reduce((acc, day) => ({ ...acc, [day]: true }), {}),
+  )
 
   const handleToggleDay = (day: string) => {
     setDayEnabled((prev) => ({
       ...prev,
       [day]: !prev[day],
-    }));
-  };
+    }))
+  }
 
   return (
     <Card className="lg:col-span-2">
@@ -36,7 +43,10 @@ export function OperatingHoursSettings() {
       </CardHeader>
       <CardContent className="space-y-4">
         {daysOfWeek.map((day) => (
-          <div key={day} className="flex items-center justify-between space-x-4">
+          <div
+            key={day}
+            className="flex items-center justify-between space-x-4"
+          >
             <div className="flex items-center space-x-2">
               <Checkbox
                 id={`enable-${day.toLowerCase()}`}
@@ -64,5 +74,5 @@ export function OperatingHoursSettings() {
         ))}
       </CardContent>
     </Card>
-  );
+  )
 }

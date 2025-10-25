@@ -1,3 +1,4 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
 import { Helmet } from 'react-helmet-async'
 import { useForm } from 'react-hook-form'
@@ -9,7 +10,6 @@ import { signIn } from '@/api/sign-in'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { zodResolver } from '@hookform/resolvers/zod'
 
 const signInForm = z.object({
   email: z.string().email('E-mail inválido'),
@@ -80,9 +80,9 @@ export function SignIn() {
               <Label htmlFor="password">Tu contraseña</Label>
               <Input id="password" type="password" {...register('password')} />
               {errors.password && (
-                <p className="text-sm text-red-500">{
-                  errors.password.message
-                }</p>
+                <p className="text-sm text-red-500">
+                  {errors.password.message}
+                </p>
               )}
             </div>
 

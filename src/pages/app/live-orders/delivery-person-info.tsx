@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+
 import { DeliveryPerson } from './dashboard'
 
 interface DeliveryPersonInfoProps {
@@ -12,10 +13,18 @@ export function DeliveryPersonInfo({ person }: DeliveryPersonInfoProps) {
         <CardTitle>Información del Repartidor</CardTitle>
       </CardHeader>
       <CardContent className="space-y-2">
-        <p><span className="font-semibold">Nombre:</span> {person.name}</p>
-        <p><span className="font-semibold">Vehículo:</span> {person.vehicle}</p>
-        <p><span className="font-semibold">Pedido:</span> {person.orderId}</p>
-        <p><span className="font-semibold">Dirección:</span> {person.address}</p>
+        <p>
+          <span className="font-semibold">Nombre:</span> {person.name}
+        </p>
+        <p>
+          <span className="font-semibold">Vehículo:</span> {person.vehicle}
+        </p>
+        <p>
+          <span className="font-semibold">Pedido:</span> {person.orderId}
+        </p>
+        <p>
+          <span className="font-semibold">Dirección:</span> {person.address}
+        </p>
       </CardContent>
     </Card>
   )

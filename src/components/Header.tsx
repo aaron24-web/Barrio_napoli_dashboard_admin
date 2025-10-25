@@ -1,4 +1,4 @@
-import { Home, UtensilsCrossed, Cog, Briefcase, BarChart } from 'lucide-react'
+import { BarChart, Briefcase, Cog, Home, UtensilsCrossed } from 'lucide-react'
 
 import { AccountMenu } from './account-menu'
 import { NavLink } from './nav-link'
@@ -9,7 +9,11 @@ export function Header() {
   return (
     <div className="border-b">
       <div className="flex h-16 items-center gap-6 px-6">
-        <img src="/Barrio_Napoli_Logo.png" alt="Barrio Napoli Logo" className="h-8 w-8" />
+        <img
+          src="/Barrio_Napoli_Logo.png"
+          alt="Barrio Napoli Logo"
+          className="h-8 w-8"
+        />
 
         <Separator orientation="vertical" className="h-6" />
 

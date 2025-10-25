@@ -1,8 +1,8 @@
-
 import { Helmet } from 'react-helmet-async'
-import { ShippingSettings } from './shipping-settings'
+
 import { BillingSettings } from './billing-settings'
 import { OperatingHoursSettings } from './operating-hours-settings'
+import { ShippingSettings } from './shipping-settings'
 
 export function Settings() {
   return (

@@ -22,6 +22,10 @@ export interface GetOrderDetailsResponse {
       name: string
     }
   }[]
+  deliveryMan: {
+    id: string
+    name: string
+  } | null
 }
 
 export async function getOrderDetails({ orderId }: GetOrderDetailsParams) {

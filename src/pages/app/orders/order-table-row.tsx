@@ -1,20 +1,21 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { AxiosError } from 'axios'
 import { formatDistanceToNow } from 'date-fns'
 import { es } from 'date-fns/locale'
-import { ArrowRight, Search, X } from 'lucide-react'
+import { ArrowRight, Loader2, Search, X } from 'lucide-react'
 import { useState } from 'react'
+import { toast } from 'sonner'
 
 import { approveOrder } from '@/api/approve-order'
 import { cancelOrder } from '@/api/cancel-order'
 import { deliveryOrder } from '@/api/delivery-order'
 import { dispatchOrder } from '@/api/dispatch-order'
-import { GetOrdersResponse } from '@/api/get-orders'
-import { OrderStatus } from '@/components/order-status'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import { TableCell, TableRow } from '@/components/ui/table'
 
 import { OrderDetails } from './order-details'
+import { OrderStatus } from '@/components/order-status'
 
 interface OrderTableRowProps {
   order: {
@@ -30,58 +31,55 @@ export function OrderTableRow({ order }: OrderTableRowProps) {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false)
   const queryClient = useQueryClient()
 
-  function updateOrderStatusOnCache(orderId: string, status: OrderStatus) {
-    const ordersListCache = queryClient.getQueriesData<GetOrdersResponse>({
-      queryKey: ['orders'],
-    })
-
-    ordersListCache.forEach(([cacheKey, cacheData]) => {
-      if (!cacheData) {
-        return
-      }
-
-      queryClient.setQueryData<GetOrdersResponse>(cacheKey, {
-        ...cacheData,
-        orders: cacheData.orders.map((order) => {
-          if (order.orderId === orderId) {
-            return { ...order, status }
-          }
-
-          return order
-        }),
-      })
-    })
-  }
-
   const { mutateAsync: cancelOrderFn, isPending: isCancellingOrder } =
     useMutation({
       mutationFn: cancelOrder,
-      async onSuccess(_, { orderId }) {
-        updateOrderStatusOnCache(orderId, 'canceled')
+      async onSuccess() {
+        queryClient.invalidateQueries({ queryKey: ['orders'] })
+        toast.success('Pedido cancelado con éxito.')
+      },
+      onError() {
+        toast.error('Error al cancelar el pedido, por favor intente de nuevo.')
       },
     })
 
   const { mutateAsync: approveOrderFn, isPending: isApprovingOrder } =
     useMutation({
       mutationFn: approveOrder,
-      async onSuccess(_, { orderId }) {
-        updateOrderStatusOnCache(orderId, 'processing')
+      async onSuccess() {
+        queryClient.invalidateQueries({ queryKey: ['orders'] })
+        toast.success(`Pedido ${order.orderId} aceptado con éxito.`)
+      },
+      onError(error: AxiosError) {
+        if (error.response?.status === 409) {
+          toast.error('Este pedido ya fue actualizado por otro operador.')
+        } else {
+          toast.error('Error al aceptar el pedido, por favor intente de nuevo.')
+        }
       },
     })
 
   const { mutateAsync: dispatchOrderFn, isPending: isDispatchingOrder } =
     useMutation({
       mutationFn: dispatchOrder,
-      async onSuccess(_, { orderId }) {
-        updateOrderStatusOnCache(orderId, 'delivering')
+      async onSuccess() {
+        queryClient.invalidateQueries({ queryKey: ['orders'] })
+        toast.success(`Pedido ${order.orderId} enviado.`)
+      },
+      onError() {
+        toast.error('Error al enviar el pedido, por favor intente de nuevo.')
       },
     })
 
   const { mutateAsync: deliverOrderFn, isPending: isDeliveringOrder } =
     useMutation({
       mutationFn: deliveryOrder,
-      async onSuccess(_, { orderId }) {
-        updateOrderStatusOnCache(orderId, 'delivered')
+      async onSuccess() {
+        queryClient.invalidateQueries({ queryKey: ['orders'] })
+        toast.success(`Pedido ${order.orderId} entregado.`)
+      },
+      onError() {
+        toast.error('Error al entregar el pedido, por favor intente de nuevo.')
       },
     })
 
@@ -125,12 +123,16 @@ export function OrderTableRow({ order }: OrderTableRowProps) {
             variant="outline"
             size="xs"
           >
-            <ArrowRight className="mr-2 h-3 w-3" />
-            Aprobar
+            {isApprovingOrder ? (
+              <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+            ) : (
+              <ArrowRight className="mr-2 h-3 w-3" />
+            )}
+            Aceptar
           </Button>
         )}
 
-        {order.status === 'processing' && (
+        {order.status === 'accepted' && (
           <Button
             onClick={() => dispatchOrderFn({ orderId: order.orderId })}
             disabled={isDispatchingOrder}
@@ -157,7 +159,7 @@ export function OrderTableRow({ order }: OrderTableRowProps) {
       <TableCell>
         <Button
           disabled={
-            !['pending', 'processing'].includes(order.status) ||
+            !['pending', 'processing', 'accepted'].includes(order.status) ||
             isCancellingOrder
           }
           onClick={() => cancelOrderFn({ orderId: order.orderId })}

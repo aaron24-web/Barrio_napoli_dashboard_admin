@@ -28,7 +28,8 @@ const profileSchema = z
       return true
     },
     {
-      message: 'La contraseña actual es obligatoria para cambiar la contraseña.',
+      message:
+        'La contraseña actual es obligatoria para cambiar la contraseña.',
       path: ['currentPassword'],
     },
   )

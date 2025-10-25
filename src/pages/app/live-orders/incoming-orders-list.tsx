@@ -1,13 +1,23 @@
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { OrderStatus } from '@/components/order-status'
 import { GetOrdersResponse } from '@/api/get-orders'
+import { OrderStatus } from '@/components/order-status'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 
 interface IncomingOrdersListProps {
   orders: GetOrdersResponse | undefined
   onSelectOrder: (orderId: string) => void
 }
 
-export function IncomingOrdersList({ orders, onSelectOrder }: IncomingOrdersListProps) {
+export function IncomingOrdersList({
+  orders,
+  onSelectOrder,
+}: IncomingOrdersListProps) {
   return (
     <div className="rounded-md border">
       <Table>

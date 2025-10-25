@@ -1,8 +1,8 @@
 import { Helmet } from 'react-helmet-async'
-import { ProductManagement } from '../business/product-management'
 
-import { CategoryManagement } from '../business/category-management'
 import { AddonManagement } from '../business/addon-management'
+import { CategoryManagement } from '../business/category-management'
+import { ProductManagement } from '../business/product-management'
 import { PromotionManagement } from '../business/promotion-management'
 
 export function Orders() {

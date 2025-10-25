@@ -7,10 +7,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { colors } from '@/components/ui/colors'
 
 export function PopularProductsChart() {
-  const { data: popularProducts, isFetching: isFetchingPopularProducts } = useQuery({
-    queryKey: ['metrics', 'popular-products'],
-    queryFn: getPopularProducts,
-  })
+  const { data: popularProducts, isFetching: isFetchingPopularProducts } =
+    useQuery({
+      queryKey: ['metrics', 'popular-products'],
+      queryFn: getPopularProducts,
+    })
 
   return (
     <Card className="col-span-3">
@@ -23,7 +24,9 @@ export function PopularProductsChart() {
         </div>
       </CardHeader>
       <CardContent>
-        {isFetchingPopularProducts && <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />}
+        {isFetchingPopularProducts && (
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        )}
         {popularProducts && (
           <ResponsiveContainer width="100%" height={240}>
             <PieChart style={{ fontSize: 12 }}>
@@ -37,7 +40,15 @@ export function PopularProductsChart() {
                 innerRadius={64}
                 strokeWidth={8}
                 labelLine={false}
-                label={({ cx, cy, midAngle, innerRadius, outerRadius, value, index }) => {
+                label={({
+                  cx,
+                  cy,
+                  midAngle,
+                  innerRadius,
+                  outerRadius,
+                  value,
+                  index,
+                }) => {
                   const RADIAN = Math.PI / 180
                   const radius = 12 + innerRadius + (outerRadius - innerRadius)
                   const x = cx + radius * Math.cos(-midAngle * RADIAN)
@@ -52,7 +63,9 @@ export function PopularProductsChart() {
                       dominantBaseline="central"
                     >
                       {popularProducts[index].product.length > 12
-                        ? popularProducts[index].product.substring(0, 12).concat('...')
+                        ? popularProducts[index].product
+                            .substring(0, 12)
+                            .concat('...')
                         : popularProducts[index].product}{' '}
                       ({value})
                     </text>
@@ -60,7 +73,13 @@ export function PopularProductsChart() {
                 }}
               >
                 {popularProducts.map((_, i) => {
-                  return <Cell key={`cell-${i}`} fill={colors[i]} className="stroke-background hover:opacity-80" />
+                  return (
+                    <Cell
+                      key={`cell-${i}`}
+                      fill={colors[i]}
+                      className="stroke-background hover:opacity-80"
+                    />
+                  )
                 })}
               </Pie>
             </PieChart>

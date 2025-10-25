@@ -1,12 +1,14 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { ArrowRight, X } from 'lucide-react'
+import { AxiosError } from 'axios'
+import { ArrowRight, Loader2, X } from 'lucide-react'
+import { toast } from 'sonner'
 
 import { approveOrder } from '@/api/approve-order'
 import { cancelOrder } from '@/api/cancel-order'
 import { deliveryOrder } from '@/api/delivery-order'
 import { dispatchOrder } from '@/api/dispatch-order'
-import { GetOrderDetailsResponse } from '@/api/get-order-details'
-import { GetOrdersResponse, OrderStatus } from '@/api/get-orders'
+import { GetOrdersResponse } from '@/api/get-orders'
+import { OrderStatus } from '@/components/order-status'
 import { Button } from '@/components/ui/button'
 
 interface OrderActionsPanelProps {
@@ -18,33 +20,24 @@ export function OrderActionsPanel({ orderId, status }: OrderActionsPanelProps) {
   const queryClient = useQueryClient()
 
   function updateOrderStatusOnCache(orderId: string, status: OrderStatus) {
-    const ordersListCache = queryClient.getQueriesData<GetOrdersResponse>({
-      queryKey: ['orders'],
-    })
+    const queryKey = [
+      'orders',
+      1,
+      null,
+      null,
+      ['pending', 'processing', 'delivering'],
+    ]
+    const ordersListCache = queryClient.getQueryData<GetOrdersResponse>(queryKey)
 
-    ordersListCache.forEach(([cacheKey, cacheData]) => {
-      if (!cacheData) {
-        return
-      }
-
-      queryClient.setQueryData<GetOrdersResponse>(cacheKey, {
-        ...cacheData,
-        orders: cacheData.orders.map((order) => {
+    if (ordersListCache) {
+      queryClient.setQueryData<GetOrdersResponse>(queryKey, {
+        ...ordersListCache,
+        orders: ordersListCache.orders.map((order) => {
           if (order.orderId === orderId) {
             return { ...order, status }
           }
-
           return order
         }),
-      })
-    })
-
-    const orderDetailsCache = queryClient.getQueryData<GetOrderDetailsResponse>(['order', orderId])
-
-    if (orderDetailsCache) {
-      queryClient.setQueryData<GetOrderDetailsResponse>(['order', orderId], {
-        ...orderDetailsCache,
-        status,
       })
     }
   }
@@ -54,7 +47,11 @@ export function OrderActionsPanel({ orderId, status }: OrderActionsPanelProps) {
       mutationFn: cancelOrder,
       async onSuccess(_, { orderId }) {
         updateOrderStatusOnCache(orderId, 'canceled')
-        queryClient.invalidateQueries({ queryKey: ['orders'] })
+        queryClient.invalidateQueries({ queryKey: ['order', orderId] })
+        toast.success('Pedido cancelado con éxito.')
+      },
+      onError() {
+        toast.error('Error al cancelar el pedido, por favor intente de nuevo.')
       },
     })
 
@@ -63,7 +60,15 @@ export function OrderActionsPanel({ orderId, status }: OrderActionsPanelProps) {
       mutationFn: approveOrder,
       async onSuccess(_, { orderId }) {
         updateOrderStatusOnCache(orderId, 'accepted')
-        queryClient.invalidateQueries({ queryKey: ['orders'] })
+        queryClient.invalidateQueries({ queryKey: ['order', orderId] })
+        toast.success(`Pedido ${orderId} aceptado con éxito.`)
+      },
+      onError(error: AxiosError) {
+        if (error.response?.status === 409) {
+          toast.error('Este pedido ya fue actualizado por otro operador.')
+        } else {
+          toast.error('Error al aceptar el pedido, por favor intente de nuevo.')
+        }
       },
     })
 
@@ -72,7 +77,11 @@ export function OrderActionsPanel({ orderId, status }: OrderActionsPanelProps) {
       mutationFn: dispatchOrder,
       async onSuccess(_, { orderId }) {
         updateOrderStatusOnCache(orderId, 'processing')
-        queryClient.invalidateQueries({ queryKey: ['orders'] })
+        queryClient.invalidateQueries({ queryKey: ['order', orderId] })
+        toast.success(`Pedido ${orderId} en proceso.`)
+      },
+      onError() {
+        toast.error('Error al procesar el pedido, por favor intente de nuevo.')
       },
     })
 
@@ -81,7 +90,11 @@ export function OrderActionsPanel({ orderId, status }: OrderActionsPanelProps) {
       mutationFn: deliveryOrder,
       async onSuccess(_, { orderId }) {
         updateOrderStatusOnCache(orderId, 'delivering')
-        queryClient.invalidateQueries({ queryKey: ['orders'] })
+        queryClient.invalidateQueries({ queryKey: ['order', orderId] })
+        toast.success(`Pedido ${orderId} en reparto.`)
+      },
+      onError() {
+        toast.error('Error al entregar el pedido, por favor intente de nuevo.')
       },
     })
 
@@ -90,7 +103,11 @@ export function OrderActionsPanel({ orderId, status }: OrderActionsPanelProps) {
       mutationFn: deliveryOrder, // This should be a new function to finish the order
       async onSuccess(_, { orderId }) {
         updateOrderStatusOnCache(orderId, 'delivered')
-        queryClient.invalidateQueries({ queryKey: ['orders'] })
+        queryClient.invalidateQueries({ queryKey: ['order', orderId] })
+        toast.success(`Pedido ${orderId} finalizado.`)
+      },
+      onError() {
+        toast.error('Error al finalizar el pedido, por favor intente de nuevo.')
       },
     })
 
@@ -103,7 +120,11 @@ export function OrderActionsPanel({ orderId, status }: OrderActionsPanelProps) {
           variant="outline"
           size="xs"
         >
-          <ArrowRight className="mr-2 h-3 w-3" />
+          {isApprovingOrder ? (
+            <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+          ) : (
+            <ArrowRight className="mr-2 h-3 w-3" />
+          )}
           Aceptar Pedido
         </Button>
       )}
@@ -115,7 +136,11 @@ export function OrderActionsPanel({ orderId, status }: OrderActionsPanelProps) {
           variant="outline"
           size="xs"
         >
-          <ArrowRight className="mr-2 h-3 w-3" />
+          {isDispatchingOrder ? (
+            <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+          ) : (
+            <ArrowRight className="mr-2 h-3 w-3" />
+          )}
           En Proceso
         </Button>
       )}
@@ -127,7 +152,11 @@ export function OrderActionsPanel({ orderId, status }: OrderActionsPanelProps) {
           variant="outline"
           size="xs"
         >
-          <ArrowRight className="mr-2 h-3 w-3" />
+          {isDeliveringOrder ? (
+            <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+          ) : (
+            <ArrowRight className="mr-2 h-3 w-3" />
+          )}
           En Reparto
         </Button>
       )}
@@ -139,14 +168,19 @@ export function OrderActionsPanel({ orderId, status }: OrderActionsPanelProps) {
           variant="outline"
           size="xs"
         >
-          <ArrowRight className="mr-2 h-3 w-3" />
+          {isFinishingOrder ? (
+            <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+          ) : (
+            <ArrowRight className="mr-2 h-3 w-3" />
+          )}
           Finalizado
         </Button>
       )}
 
       <Button
         disabled={
-          !['pending', 'accepted', 'processing'].includes(status) || isCancellingOrder
+          !['pending', 'accepted', 'processing'].includes(status) ||
+          isCancellingOrder
         }
         onClick={() => cancelOrderFn({ orderId })}
         variant="ghost"

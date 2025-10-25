@@ -1,5 +1,6 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Link } from 'react-router-dom'
+
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export function PromotionManagement() {
   return (
@@ -9,7 +10,10 @@ export function PromotionManagement() {
           <CardTitle>Gestión de Promociones</CardTitle>
         </CardHeader>
         <CardContent>
-          <p>Crear ofertas especiales, combos o cupones, estableciendo sus condiciones y su duración.</p>
+          <p>
+            Crear ofertas especiales, combos o cupones, estableciendo sus
+            condiciones y su duración.
+          </p>
         </CardContent>
       </Card>
     </Link>

@@ -53,7 +53,9 @@ export const getOrdersMock = http.get<never, never, GetOrdersResponse>(
 
     if (status) {
       const statuses = status.split(',')
-      filteredOrders = filteredOrders.filter((order) => statuses.includes(order.status))
+      filteredOrders = filteredOrders.filter((order) =>
+        statuses.includes(order.status),
+      )
     }
 
     const paginatedOrders = filteredOrders.slice(

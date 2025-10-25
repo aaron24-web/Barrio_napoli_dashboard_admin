@@ -4,6 +4,7 @@ import { env } from '@/env'
 
 import { approveOrderMock } from './approve-order-mock'
 import { cancelOrderMock } from './cancel-order-mock'
+import { changePasswordMock } from './change-password-mock'
 import { deliverOrderMock } from './deliver-order-mock'
 import { dispatchOrderMock } from './dispatch-order-mock'
 import { getDailyRevenueInPeriodMock } from './get-daily-revenue-in-period-mock'
@@ -15,12 +16,11 @@ import { getMonthRevenueMock } from './get-month-revenue-mock'
 import { getOrderDetailsMock } from './get-orders-details-mock'
 import { getOrdersMock } from './get-orders-mock'
 import { getPopularProductsMock } from './get-popular-products-mock'
-import { getSalesTransactionsMock } from './get-sales-transactions-mock'
 import { getProfileMock } from './get-profile-mock'
+import { getSalesTransactionsMock } from './get-sales-transactions-mock'
 import { registerRestaurantMock } from './register-restaurant-mock'
 import { signInMock } from './sign-in-mock'
 import { updateProfileMock } from './update-profile-mock'
-import { changePasswordMock } from './change-password-mock'
 
 export const worker = setupWorker(
   signInMock,

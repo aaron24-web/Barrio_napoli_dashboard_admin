@@ -1,19 +1,19 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useQuery } from '@tanstack/react-query'
+import { subDays } from 'date-fns'
 import { useState } from 'react'
 import { DateRange } from 'react-day-picker'
-import { subDays } from 'date-fns'
 import {
-  BarChart,
-  XAxis,
-  YAxis,
-  CartesianGrid,
   Bar,
+  BarChart,
+  CartesianGrid,
   ResponsiveContainer,
   Tooltip,
+  XAxis,
+  YAxis,
 } from 'recharts'
 
 import { getPopularProducts } from '@/api/get-popular-products'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { DateRangePicker } from '@/components/ui/date-range-picker'
 
 export function PopularProducts() {
