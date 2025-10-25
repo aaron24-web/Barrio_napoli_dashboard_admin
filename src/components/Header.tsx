@@ -24,11 +24,7 @@ export function Header() {
           </NavLink>
           <NavLink to="/orders">
             <UtensilsCrossed className="h-4 w-4" />
-            Pedidos
-          </NavLink>
-          <NavLink to="/business/products">
-            <Briefcase className="h-4 w-4" />
-            Negocio
+            Gestión del Menú
           </NavLink>
           <NavLink to="/settings">
             <Cog className="h-4 w-4" />
