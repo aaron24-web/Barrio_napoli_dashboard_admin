@@ -128,13 +128,15 @@ export function Dashboard() {
                 />
                 <OrderDetails order={selectedOrder} />
 
-                <div className="space-y-3">
+                <div className="mt-4 space-y-3">
                   <Dialog
                     open={isAssignDriverModalOpen}
                     onOpenChange={setIsAssignDriverModalOpen}
                   >
                     <DialogTrigger asChild>
-                      <Button className="w-full">Asignar repartidor</Button>
+                      <Button className="w-full">
+                        {assignedDriver ? 'Cambiar repartidor' : 'Asignar repartidor'}
+                      </Button>
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
@@ -161,8 +163,8 @@ export function Dashboard() {
                     </DialogContent>
                   </Dialog>
                   {assignedDriver && (
-                    <p className="text-sm font-medium">
-                      Repartidor asignado: {assignedDriver.name}
+                    <p className="text-sm font-medium flex items-center gap-2">
+                      <span className="text-lg">🚚</span> Repartidor asignado: {assignedDriver.name}
                     </p>
                   )}
                 </div>

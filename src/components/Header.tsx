@@ -26,6 +26,10 @@ export function Header() {
             <UtensilsCrossed className="h-4 w-4" />
             Gestión del Menú
           </NavLink>
+          <NavLink to="/delivery-men">
+            <Briefcase className="h-4 w-4" />
+            Gestión de repartidores
+          </NavLink>
           <NavLink to="/settings">
             <Cog className="h-4 w-4" />
             Configuración
