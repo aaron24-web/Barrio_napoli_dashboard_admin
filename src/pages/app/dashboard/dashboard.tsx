@@ -6,6 +6,15 @@ import { getOrderDetails } from '@/api/get-order-details'
 import { getOrders } from '@/api/get-orders'
 import { DeliveryPersonInfo } from '@/pages/app/live-orders/delivery-person-info'
 import { OrderDetails } from '@/pages/app/orders/order-details'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
 
 import { DeliveryMap } from '../live-orders/delivery-map'
 import { IncomingOrdersList } from '../live-orders/incoming-orders-list'
@@ -19,10 +28,24 @@ export interface DeliveryPerson {
   address: string
 }
 
+interface Driver {
+  id: string
+  name: string
+}
+
+const MOCK_DRIVERS: Driver[] = [
+  { id: '1', name: 'Juan Pérez' },
+  { id: '2', name: 'María Gómez' },
+  { id: '3', name: 'Carlos Ramírez' },
+]
+
 export function Dashboard() {
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null)
   const [selectedDeliveryPerson, setSelectedDeliveryPerson] =
     useState<DeliveryPerson | null>(null)
+  const [isAssignDriverModalOpen, setIsAssignDriverModalOpen] = useState(false)
+  const [assignedDriver, setAssignedDriver] = useState<Driver | null>(null)
+  const [driverSearchTerm, setDriverSearchTerm] = useState('')
 
   const { data: orders } = useQuery({
     queryKey: [
@@ -62,11 +85,22 @@ export function Dashboard() {
   function handleSelectOrder(orderId: string) {
     setSelectedOrderId(orderId)
     setSelectedDeliveryPerson(null) // Close delivery person info
+    setAssignedDriver(null) // Clear assigned driver for new order
   }
 
   function handleSelectDeliveryPerson(person: DeliveryPerson) {
     setSelectedDeliveryPerson(person)
     setSelectedOrderId(null) // Close order details
+    setAssignedDriver(null) // Clear assigned driver for new order
+  }
+
+  const filteredDrivers = MOCK_DRIVERS.filter((driver) =>
+    driver.name.toLowerCase().includes(driverSearchTerm.toLowerCase()),
+  )
+
+  function handleAssignDriver(driver: Driver) {
+    setAssignedDriver(driver)
+    setIsAssignDriverModalOpen(false)
   }
 
   return (
@@ -93,6 +127,45 @@ export function Dashboard() {
                   status={selectedOrder.status}
                 />
                 <OrderDetails order={selectedOrder} />
+
+                <div className="space-y-3">
+                  <Dialog
+                    open={isAssignDriverModalOpen}
+                    onOpenChange={setIsAssignDriverModalOpen}
+                  >
+                    <DialogTrigger asChild>
+                      <Button className="w-full">Asignar repartidor</Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Seleccionar repartidor</DialogTitle>
+                      </DialogHeader>
+                      <Input
+                        placeholder="Buscar repartidor..."
+                        value={driverSearchTerm}
+                        onChange={(e) => setDriverSearchTerm(e.target.value)}
+                        className="mb-4"
+                      />
+                      <div className="space-y-2">
+                        {filteredDrivers.map((driver) => (
+                          <Button
+                            key={driver.id}
+                            variant="ghost"
+                            className="w-full justify-start"
+                            onClick={() => handleAssignDriver(driver)}
+                          >
+                            {driver.name}
+                          </Button>
+                        ))}
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                  {assignedDriver && (
+                    <p className="text-sm font-medium">
+                      Repartidor asignado: {assignedDriver.name}
+                    </p>
+                  )}
+                </div>
               </>
             )}
             {selectedDeliveryPerson && (

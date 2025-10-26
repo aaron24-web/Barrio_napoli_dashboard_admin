@@ -129,45 +129,6 @@ export function OrderDetails({ order }: OrderDetailsProps) {
             </TableBody>
           </Table>
 
-          {['accepted', 'processing', 'delivering'].includes(order.status) && (
-            <form onSubmit={handleSubmit(handleAssignDeliveryMan)}>
-              <div className="space-y-3">
-                <h2 className="text-lg font-semibold">
-                  Asignación de repartidor
-                </h2>
-                <div className="flex items-center gap-2">
-                  <Controller
-                    name="deliveryManId"
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value ?? ''}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Seleccionar repartidor..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {deliveryMen?.deliveryMen.map((deliveryMan) => (
-                            <SelectItem
-                              key={deliveryMan.id}
-                              value={deliveryMan.id}
-                            >
-                              {deliveryMan.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                  <Button type="submit" disabled={isSubmitting}>
-                    Asignar repartidor
-                  </Button>
-                </div>
-              </div>
-            </form>
-          )}
-
           <Table>
             <TableHeader>
               <TableRow>
@@ -215,8 +176,55 @@ export function OrderDetails({ order }: OrderDetailsProps) {
                   })}
                 </TableCell>
               </TableRow>
+              {order.deliveryMan && (
+                <TableRow>
+                  <TableCell colSpan={3}>Repartidor asignado</TableCell>
+                  <TableCell className="text-right font-medium">
+                    {order.deliveryMan.name}
+                  </TableCell>
+                </TableRow>
+              )}
             </TableFooter>
           </Table>
+
+          {['accepted', 'processing', 'delivering'].includes(order.status) && (
+            <form onSubmit={handleSubmit(handleAssignDeliveryMan)}>
+              <div className="space-y-3">
+                <h2 className="text-lg font-semibold">
+                  Asignar repartidor
+                </h2>
+                <div className="flex items-center gap-2">
+                  <Controller
+                    name="deliveryManId"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value ?? ''}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccionar repartidor..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {deliveryMen?.deliveryMen.map((deliveryMan) => (
+                            <SelectItem
+                              key={deliveryMan.id}
+                              value={deliveryMan.id}
+                            >
+                              {deliveryMan.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  <Button type="submit" disabled={isSubmitting}>
+                    Asignar repartidor
+                  </Button>
+                </div>
+              </div>
+            </form>
+          )}
         </div>
       ) : (
         <OrderDetailsSkeleton />
