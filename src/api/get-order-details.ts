@@ -20,6 +20,8 @@ export interface GetOrderDetailsResponse {
     quantity: number
     product: {
       name: string
+      description: string
+      notes: string | null
     }
   }[]
   deliveryMan: {

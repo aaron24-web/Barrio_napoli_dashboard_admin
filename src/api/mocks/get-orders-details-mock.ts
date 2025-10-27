@@ -19,23 +19,37 @@ export const getOrderDetailsMock = http.get<
     },
     status: 'pending',
     createdAt: new Date().toISOString(),
-    totalInCents: Math.floor(Math.random() * 10000) + 5000,
+    totalInCents: 7900,
     orderItems: [
       {
         id: `order-item-${params.orderId}-1`,
-        priceInCents: Math.floor(Math.random() * 5000) + 1000,
+        priceInCents: 2500,
         product: {
-          name: `Pizza ${params.orderId}`,
+          name: 'Pizza Margherita',
+          description: 'extra queso, masa delgada',
+          notes: null,
         },
-        quantity: Math.floor(Math.random() * 3) + 1,
+        quantity: 2,
       },
       {
         id: `order-item-${params.orderId}-2`,
-        priceInCents: Math.floor(Math.random() * 2000) + 500,
+        priceInCents: 1200,
         product: {
-          name: `Drink ${params.orderId}`,
+          name: 'Cuba',
+          description: 'con limón',
+          notes: 'poco hielo',
         },
-        quantity: Math.floor(Math.random() * 2) + 1,
+        quantity: 1,
+      },
+      {
+        id: `order-item-${params.orderId}-3`,
+        priceInCents: 1700,
+        product: {
+          name: 'Pasta Alfredo con pollo',
+          description: '+ pan de ajo',
+          notes: null,
+        },
+        quantity: 1,
       },
     ],
   })

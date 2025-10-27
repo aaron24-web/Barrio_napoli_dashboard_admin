@@ -143,7 +143,17 @@ export function OrderDetails({ order }: OrderDetailsProps) {
               {order.orderItems.map((item) => {
                 return (
                   <TableRow key={item.id}>
-                    <TableCell>{item.product.name}</TableCell>
+                    <TableCell>
+                      <div>{item.product.name}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {item.product.description}
+                      </div>
+                      {item.product.notes && (
+                        <div className="text-xs text-muted-foreground">
+                          Observaciones: {item.product.notes}
+                        </div>
+                      )}
+                    </TableCell>
                     <TableCell className="text-right">
                       {item.quantity}
                     </TableCell>
