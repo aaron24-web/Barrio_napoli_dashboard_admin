@@ -16,7 +16,7 @@ export function AuthLayout() {
           <span className="text-xl font-semibold">Barrio Napoli</span>
         </div>
         <footer className="text-sm">
-          Paínel do parceiro &copy; Barrio Napoli - {new Date().getFullYear()}
+          Panel del socio &copy; Barrio Napoli - {new Date().getFullYear()}
         </footer>
       </div>
 
