@@ -1,8 +1,7 @@
 import { Bike } from 'lucide-react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-
-import { DeliveryPerson } from '../dashboard/dashboard'
+import { DeliveryPerson } from '@/core/models'
 
 interface DeliveryMapProps {
   onSelectDeliveryPerson: (person: DeliveryPerson) => void

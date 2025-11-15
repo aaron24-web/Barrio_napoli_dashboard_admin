@@ -6,13 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-
-interface DeliveryMan {
-  id: string
-  name: string
-  phone: string
-  status: 'active' | 'inactive'
-}
+import { CreateDeliveryManPayload, DeliveryMan } from '@/core/models/delivery.model'
 
 const createDeliveryManFormSchema = z.object({
   name: z.string().min(1, 'El nombre es obligatorio'),
@@ -22,7 +16,7 @@ const createDeliveryManFormSchema = z.object({
 type CreateDeliveryManForm = z.infer<typeof createDeliveryManFormSchema>
 
 interface CreateDeliveryManProps {
-  onCreate: (deliveryMan: { name: string; phone: string; status?: 'active' | 'inactive' }) => void
+  onCreate: (deliveryMan: CreateDeliveryManPayload) => void
   initialData?: DeliveryMan
 }
 
@@ -42,7 +36,6 @@ export function CreateDeliveryMan({ onCreate, initialData }: CreateDeliveryManPr
     onCreate({
       name: data.name,
       phone: data.phone,
-      status: initialData?.status || 'active', // Default to active if not editing
     })
     reset()
   }

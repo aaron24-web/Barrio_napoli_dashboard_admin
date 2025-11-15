@@ -1,4 +1,3 @@
-import { useQuery } from '@tanstack/react-query'
 import { subDays } from 'date-fns'
 import { useState } from 'react'
 import { DateRange } from 'react-day-picker'
@@ -12,9 +11,9 @@ import {
   YAxis,
 } from 'recharts'
 
-import { getPopularProducts } from '@/api/get-popular-products'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { DateRangePicker } from '@/components/ui/date-range-picker'
+import { useGetPopularProductsQuery } from '@/core/hooks/useMetrics'
 
 export function PopularProducts() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
@@ -22,9 +21,9 @@ export function PopularProducts() {
     to: new Date(),
   })
 
-  const { data: popularProducts } = useQuery({
-    queryKey: ['metrics', 'popular-products', dateRange],
-    queryFn: () => getPopularProducts(), // Assuming getPopularProducts can take date range params if needed
+  const { data: popularProducts } = useGetPopularProductsQuery({
+    from: dateRange?.from,
+    to: dateRange?.to,
   })
 
   return (

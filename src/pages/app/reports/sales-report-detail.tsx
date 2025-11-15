@@ -1,4 +1,3 @@
-import { useQuery } from '@tanstack/react-query'
 import { subDays } from 'date-fns'
 import { useState } from 'react'
 import { DateRange } from 'react-day-picker'
@@ -13,8 +12,6 @@ import {
   YAxis,
 } from 'recharts'
 
-import { getDailyRevenueAmount } from '@/api/get-daily-revenue-in-period'
-import { getSalesTransactions } from '@/api/get-sales-transactions'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { DateRangePicker } from '@/components/ui/date-range-picker'
 import {
@@ -25,6 +22,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import {
+  useGetDailyRevenueInPeriodQuery,
+  useGetSalesTransactionsQuery,
+} from '@/core/hooks/useMetrics'
 
 export function SalesReportDetail() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
@@ -32,23 +33,14 @@ export function SalesReportDetail() {
     to: new Date(),
   })
 
-  const { data: dailyRevenueInPeriod } = useQuery({
-    queryKey: ['metrics', 'daily-revenue-in-period', dateRange],
-    queryFn: () =>
-      getDailyRevenueAmount({
-        from: dateRange?.from,
-        to: dateRange?.to,
-      }),
-    enabled: !!dateRange?.from && !!dateRange?.to,
+  const { data: dailyRevenueInPeriod } = useGetDailyRevenueInPeriodQuery({
+    from: dateRange?.from,
+    to: dateRange?.to,
   })
 
-  const { data: salesTransactions } = useQuery({
-    queryKey: ['sales', 'transactions', dateRange],
-    queryFn: () =>
-      getSalesTransactions({
-        from: dateRange?.from,
-        to: dateRange?.to,
-      }),
+  const { data: salesTransactions } = useGetSalesTransactionsQuery({
+    from: dateRange?.from,
+    to: dateRange?.to,
   })
 
   return (

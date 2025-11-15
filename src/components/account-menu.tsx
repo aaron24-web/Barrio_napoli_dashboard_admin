@@ -1,10 +1,8 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
 import { ChevronDown, LogOut, User } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
 
-import { getManagedRestaurant } from '@/api/get-manage-restaurant'
-import { getProfile } from '@/api/get-profile'
-import { signOut } from '@/api/sign-out'
+import { useSignOutMutation } from '@/core/hooks/useAuth'
+import { useGetManagedRestaurantQuery } from '@/core/hooks/useRestaurant'
+import { useGetProfileQuery } from '@/core/hooks/useUser'
 
 import { AdminProfileDialog } from './admin-profile-dialog'
 import { Button } from './ui/button'
@@ -20,27 +18,12 @@ import {
 import { Skeleton } from './ui/skeleton'
 
 export function AccountMenu() {
-  const navigate = useNavigate()
-
-  const { data: profile, isLoading: isLoadingProfile } = useQuery({
-    queryKey: ['profile'],
-    queryFn: getProfile,
-    staleTime: Infinity,
-  })
+  const { data: profile, isLoading: isLoadingProfile } = useGetProfileQuery()
 
   const { data: managedRestaurant, isLoading: isLoadingManagedRestaurant } =
-    useQuery({
-      queryKey: ['managed-restaurant'],
-      queryFn: getManagedRestaurant,
-      staleTime: Infinity,
-    })
+    useGetManagedRestaurantQuery()
 
-  const { mutateAsync: signOutFn, isPending: isSignInOut } = useMutation({
-    mutationFn: signOut,
-    onSuccess: () => {
-      navigate('/sign-in', { replace: true })
-    },
-  })
+  const { mutateAsync: signOutFn, isPending: isSigningOut } = useSignOutMutation()
 
   return (
     <Dialog>
@@ -84,7 +67,7 @@ export function AccountMenu() {
           <DropdownMenuItem
             asChild
             className="text-rose-500 dark:text-rose-400"
-            disabled={isSignInOut}
+            disabled={isSigningOut}
           >
             <button className="w-full" onClick={() => signOutFn()}>
               <LogOut className="mr-2 h-4 w-4" />

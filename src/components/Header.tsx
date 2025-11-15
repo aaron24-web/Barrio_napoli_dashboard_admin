@@ -22,7 +22,7 @@ export function Header() {
             <Home className="h-4 w-4" />
             Inicio
           </NavLink>
-          <NavLink to="/orders">
+          <NavLink to="/business/menu">
             <UtensilsCrossed className="h-4 w-4" />
             Gestión del Menú
           </NavLink>

@@ -1,15 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation } from '@tanstack/react-query'
 import { Helmet } from 'react-helmet-async'
 import { useForm } from 'react-hook-form'
-import { Link, useNavigate } from 'react-router-dom'
-import { toast } from 'sonner'
+import { Link } from 'react-router-dom'
 import { z } from 'zod'
 
-import { registerRestaurantIn } from '@/api/register-restaurant'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useRegisterRestaurantMutation } from '@/core/hooks/useRestaurant'
 
 const signUpForm = z.object({
   restaurantName: z.string().min(1, 'El nombre del restaurante es obligatorio'),
@@ -21,35 +19,19 @@ const signUpForm = z.object({
 type SignUpForm = z.infer<typeof signUpForm>
 
 export function SignUp() {
-  const navigate = useNavigate()
-
-  const {
-    register,
-    handleSubmit,
-    formState: { isSubmitting, errors },
-  } = useForm<SignUpForm>({
+  const { register, handleSubmit, formState: { isSubmitting, errors } } = useForm<SignUpForm>({
     resolver: zodResolver(signUpForm),
   })
 
-  const { mutateAsync: registerRestaurantFn } = useMutation({
-    mutationFn: registerRestaurantIn,
-  })
+  const { mutateAsync: registerRestaurantFn } = useRegisterRestaurantMutation()
 
   async function handleSignUp(data: SignUpForm) {
-    try {
-      await registerRestaurantFn({
-        restaurantName: data.restaurantName,
-        managerName: data.managerName,
-        email: data.email,
-        phone: data.phone,
-      })
-
-      toast.success('Restaurante registrado con éxito')
-
-      navigate(`/sign-in?email=${data.email}`)
-    } catch {
-      toast.error('Error al registrar el restaurante')
-    }
+    await registerRestaurantFn({
+      restaurantName: data.restaurantName,
+      managerName: data.managerName,
+      email: data.email,
+      phone: data.phone,
+    })
   }
 
   return (

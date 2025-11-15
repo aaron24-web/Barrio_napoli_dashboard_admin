@@ -1,4 +1,3 @@
-import { GetOrdersResponse } from '@/api/get-orders'
 import { OrderStatus } from '@/components/order-status'
 import {
   Table,
@@ -8,9 +7,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { PaginatedOrders } from '@/core/models'
 
 interface IncomingOrdersListProps {
-  orders: GetOrdersResponse | undefined
+  orders: PaginatedOrders | undefined
   onSelectOrder: (orderId: string) => void
 }
 
@@ -30,15 +30,15 @@ export function IncomingOrdersList({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {!orders && (
+          {!orders?.results && (
             <TableRow>
               <TableCell colSpan={4} className="text-center">
                 Cargando pedidos...
               </TableCell>
             </TableRow>
           )}
-          {orders &&
-            orders.orders.map((order) => (
+          {orders?.results &&
+            orders.results.map((order) => (
               <TableRow
                 key={order.orderId}
                 onClick={() => onSelectOrder(order.orderId)}
@@ -56,7 +56,7 @@ export function IncomingOrdersList({
                 </TableCell>
               </TableRow>
             ))}
-          {orders && orders.orders.length === 0 && (
+          {orders?.results && orders.results.length === 0 && (
             <TableRow>
               <TableCell colSpan={4} className="text-center">
                 No hay pedidos entrantes.

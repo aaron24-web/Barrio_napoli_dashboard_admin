@@ -12,7 +12,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
-import { cn } from '@/lib/utils'
+import { cn } from '@/core/utils/utils'
 
 interface DateRangePickerProps extends React.ComponentProps<'div'> {
   date: DateRange | undefined

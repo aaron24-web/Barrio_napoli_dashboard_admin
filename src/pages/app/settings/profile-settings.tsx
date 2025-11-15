@@ -1,16 +1,16 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
 import { z } from 'zod'
 
-import { changePassword } from '@/api/change-password'
-import { getProfile, GetProfileResponse } from '@/api/get-profile'
-import { updateProfile } from '@/api/update-profile'
 import { Button } from '@/components/ui/button'
 import { DialogClose, DialogFooter } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useChangePasswordMutation } from '@/core/hooks/useAuth'
+import {
+  useGetProfileQuery,
+  useUpdateProfileMutation,
+} from '@/core/hooks/useUser'
 
 const profileSchema = z
   .object({
@@ -49,13 +49,9 @@ const profileSchema = z
 type ProfileSchema = z.infer<typeof profileSchema>
 
 export function ProfileSettings() {
-  const queryClient = useQueryClient()
-
-  const { data: profile } = useQuery({
-    queryKey: ['profile'],
-    queryFn: getProfile,
-    staleTime: Infinity,
-  })
+  const { data: profile } = useGetProfileQuery()
+  const { mutateAsync: updateProfileMutation } = useUpdateProfileMutation()
+  const { mutateAsync: changePasswordMutation } = useChangePasswordMutation()
 
   const {
     register,
@@ -72,60 +68,17 @@ export function ProfileSettings() {
     },
   })
 
-  function updateProfileCache({
-    name,
-    email,
-  }: {
-    name: string
-    email: string
-  }) {
-    const cached = queryClient.getQueryData<GetProfileResponse>(['profile'])
-
-    if (cached) {
-      queryClient.setQueryData<GetProfileResponse>(['profile'], {
-        ...cached,
-        name,
-        email,
-      })
-    }
-
-    return { cached }
-  }
-
-  const { mutateAsync: updateProfileMutation } = useMutation({
-    mutationFn: updateProfile,
-    onMutate({ name, email }) {
-      const { cached } = updateProfileCache({ name, email })
-      return { previousProfile: cached }
-    },
-    onError(_, __, context) {
-      if (context?.previousProfile) {
-        updateProfileCache(context.previousProfile)
-      }
-    },
-  })
-
-  const { mutateAsync: changePasswordMutation } = useMutation({
-    mutationFn: changePassword,
-  })
-
   async function handleUpdateAdminProfile(data: ProfileSchema) {
-    try {
-      await updateProfileMutation({
-        name: data.name,
-        description: '',
+    await updateProfileMutation({
+      name: data.name,
+      description: '',
+    })
+
+    if (data.newPassword && data.currentPassword) {
+      await changePasswordMutation({
+        currentPassword: data.currentPassword,
+        newPassword: data.newPassword,
       })
-
-      if (data.newPassword && data.currentPassword) {
-        await changePasswordMutation({
-          currentPassword: data.currentPassword,
-          newPassword: data.newPassword,
-        })
-      }
-
-      toast.success('¡Perfil actualizado con éxito!')
-    } catch {
-      toast.error('Error al actualizar el perfil, inténtalo de nuevo.')
     }
   }
 

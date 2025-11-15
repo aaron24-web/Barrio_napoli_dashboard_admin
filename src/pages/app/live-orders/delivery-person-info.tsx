@@ -1,6 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-
-import { DeliveryPerson } from './dashboard'
+import { DeliveryPerson } from '@/core/models'
 
 interface DeliveryPersonInfoProps {
   person: DeliveryPerson

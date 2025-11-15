@@ -1,8 +1,5 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 
-import { assignDeliveryMan } from '@/api/assign-delivery-man'
-import { getDeliveryMen } from '@/api/get-delivery-men'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -18,7 +15,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { queryClient } from '@/lib/react-query'
+import {
+  useAssignDeliveryManMutation,
+  useGetDeliveryMenQuery,
+} from '@/core/hooks/useDelivery'
 
 export interface OrderAssignDialogProps {
   orderId: string
@@ -33,19 +33,8 @@ export function OrderAssignDialog({
 }: OrderAssignDialogProps) {
   const [deliveryManId, setDeliveryManId] = useState<string | null>(null)
 
-  const { data: deliveryMen } = useQuery({
-    queryKey: ['delivery-men'],
-    queryFn: getDeliveryMen,
-    enabled: open,
-  })
-
-  const { mutateAsync: assignDeliveryManFn, isPending } = useMutation({
-    mutationFn: assignDeliveryMan,
-    async onSuccess() {
-      await queryClient.invalidateQueries({ queryKey: ['orders'] })
-      onOpenChange(false)
-    },
-  })
+  const { data: deliveryMen } = useGetDeliveryMenQuery()
+  const { mutateAsync: assignDeliveryManFn, isPending } = useAssignDeliveryManMutation()
 
   async function handleAssignDeliveryMan() {
     if (!deliveryManId) {
@@ -54,7 +43,7 @@ export function OrderAssignDialog({
 
     await assignDeliveryManFn({ orderId, deliveryManId })
 
-    // todo: show toast
+    onOpenChange(false)
   }
 
   return (

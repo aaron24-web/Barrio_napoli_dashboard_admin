@@ -1,17 +1,22 @@
-import { useQuery } from '@tanstack/react-query'
 import { BarChart, Loader2 } from 'lucide-react'
 import { Cell, Pie, PieChart, ResponsiveContainer } from 'recharts'
+import { useState } from 'react'
+import { DateRange } from 'react-day-picker'
+import { subDays } from 'date-fns'
 
-import { getPopularProducts } from '@/api/get-popular-products'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { colors } from '@/components/ui/colors'
+import { useGetPopularProductsQuery } from '@/core/hooks/useMetrics'
+import { DateRangePicker } from '@/components/ui/date-range-picker'
 
 export function PopularProductsChart() {
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: subDays(new Date(), 7),
+    to: new Date(),
+  })
+
   const { data: popularProducts, isFetching: isFetchingPopularProducts } =
-    useQuery({
-      queryKey: ['metrics', 'popular-products'],
-      queryFn: getPopularProducts,
-    })
+    useGetPopularProductsQuery({ from: dateRange?.from, to: dateRange?.to })
 
   return (
     <Card className="col-span-3">
@@ -20,7 +25,7 @@ export function PopularProductsChart() {
           <CardTitle className="text-base font-medium">
             Productos populares
           </CardTitle>
-          <BarChart className="h-4 w-4 text-muted-foreground" />
+          <DateRangePicker date={dateRange} onDateChange={setDateRange} />
         </div>
       </CardHeader>
       <CardContent>

@@ -5,6 +5,7 @@ import { AuthLayout } from './_layouts/auth'
 import { NotFound } from './404'
 import { Addons } from './app/business/addons'
 import { Categories } from './app/business/categories'
+import { MenuManagement } from './app/business/menu-management' // New import
 import { Products } from './app/business/products'
 import { Promotions } from './app/business/promotions'
 import { Dashboard } from './app/dashboard/dashboard'
@@ -25,6 +26,7 @@ export const router = createBrowserRouter([
     children: [
       { path: '/', element: <Dashboard /> },
       { path: '/orders', element: <Orders /> },
+      { path: '/business/menu', element: <MenuManagement /> }, // New route
       { path: '/business/products', element: <Products /> },
       { path: '/business/categories', element: <Categories /> },
       { path: '/business/addons', element: <Addons /> },

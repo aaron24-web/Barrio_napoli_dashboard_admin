@@ -1,15 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation } from '@tanstack/react-query'
 import { Helmet } from 'react-helmet-async'
 import { useForm } from 'react-hook-form'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { toast } from 'sonner'
+import { Link, useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
-import { signIn } from '@/api/sign-in'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useSignInMutation } from '@/core/hooks/useAuth'
 
 const signInForm = z.object({
   email: z.string().email('E-mail inválido'),
@@ -20,31 +18,18 @@ type SignInForm = z.infer<typeof signInForm>
 
 export function SignIn() {
   const [searchParams] = useSearchParams()
-  const navigate = useNavigate()
 
-  const {
-    register,
-    handleSubmit,
-    formState: { isSubmitting, errors },
-  } = useForm<SignInForm>({
+  const { register, handleSubmit, formState: { isSubmitting, errors } } = useForm<SignInForm>({
     resolver: zodResolver(signInForm),
     defaultValues: {
       email: searchParams.get('email') ?? '',
     },
   })
 
-  const { mutateAsync: authenticate } = useMutation({
-    mutationFn: signIn,
-  })
+  const { mutateAsync: authenticate } = useSignInMutation()
 
   async function handleSignIn(data: SignInForm) {
-    try {
-      await authenticate({ email: data.email, password: data.password })
-
-      navigate('/')
-    } catch {
-      toast.error('Credenciales inválidas.')
-    }
+    await authenticate({ email: data.email, password: data.password })
   }
 
   return (

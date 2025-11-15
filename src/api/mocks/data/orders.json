@@ -1,0 +1,119 @@
+{
+  "orders": [
+    {
+      "orderId": "order-1",
+      "createdAt": "2025-11-13T15:00:00.000Z",
+      "status": "pending",
+      "customerName": "Customer 1",
+      "total": 5000,
+      "customer": {
+        "name": "Customer 1",
+        "email": "customer1@example.com",
+        "phone": "123-456-7890"
+      },
+      "orderItems": [
+        {
+          "id": "item-1",
+          "product": {
+            "name": "Pizza"
+          },
+          "quantity": 2,
+          "priceInCents": 2000
+        }
+      ],
+      "totalInCents": 4000
+    },
+    {
+      "orderId": "order-2",
+      "createdAt": "2025-11-13T14:30:00.000Z",
+      "status": "accepted",
+      "customerName": "Customer 2",
+      "total": 3500,
+      "customer": {
+        "name": "Customer 2",
+        "email": "customer2@example.com",
+        "phone": "123-456-7891"
+      },
+      "orderItems": [
+        {
+          "id": "item-2",
+          "product": {
+            "name": "Pasta"
+          },
+          "quantity": 1,
+          "priceInCents": 3500
+        }
+      ],
+      "totalInCents": 3500
+    },
+    {
+      "orderId": "order-3",
+      "createdAt": "2025-11-13T14:00:00.000Z",
+      "status": "delivering",
+      "customerName": "Customer 3",
+      "total": 6000,
+      "customer": {
+        "name": "Customer 3",
+        "email": "customer3@example.com",
+        "phone": "123-456-7892"
+      },
+      "orderItems": [
+        {
+          "id": "item-3",
+          "product": {
+            "name": "Salad"
+          },
+          "quantity": 3,
+          "priceInCents": 2000
+        }
+      ],
+      "totalInCents": 6000
+    },
+    {
+      "orderId": "order-4",
+      "createdAt": "2025-11-13T13:30:00.000Z",
+      "status": "delivered",
+      "customerName": "Customer 4",
+      "total": 2500,
+      "customer": {
+        "name": "Customer 4",
+        "email": "customer4@example.com",
+        "phone": "123-456-7893"
+      },
+      "orderItems": [
+        {
+          "id": "item-4",
+          "product": {
+            "name": "Drink"
+          },
+          "quantity": 1,
+          "priceInCents": 2500
+        }
+      ],
+      "totalInCents": 2500
+    },
+    {
+      "orderId": "order-5",
+      "createdAt": "2025-11-13T13:00:00.000Z",
+      "status": "canceled",
+      "customerName": "Customer 5",
+      "total": 4500,
+      "customer": {
+        "name": "Customer 5",
+        "email": "customer5@example.com",
+        "phone": "123-456-7894"
+      },
+      "orderItems": [
+        {
+          "id": "item-5",
+          "product": {
+            "name": "Dessert"
+          },
+          "quantity": 2,
+          "priceInCents": 2250
+        }
+      ],
+      "totalInCents": 4500
+    }
+  ]
+}

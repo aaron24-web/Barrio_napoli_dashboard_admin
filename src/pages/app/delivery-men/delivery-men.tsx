@@ -38,30 +38,35 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import {
+  useCreateDeliveryManMutation,
+  useDeleteDeliveryManMutation,
+  useGetDeliveryMenQuery,
+  useToggleDeliveryManStatusMutation,
+  useUpdateDeliveryManMutation,
+} from '@/core/hooks/useDelivery'
+import { DeliveryMan } from '@/core/models/delivery.model'
 
 import { CreateDeliveryMan } from './create-delivery-man'
 
-interface DeliveryMan {
-  id: string
-  name: string
-  phone: string
-  status: 'active' | 'inactive'
-}
-
-const MOCK_DELIVERY_MEN: DeliveryMan[] = [
-  { id: '1', name: 'Juan Pérez', phone: '555-1234', status: 'active' },
-  { id: '2', name: 'María Gómez', phone: '555-5678', status: 'inactive' },
-  { id: '3', name: 'Carlos Ramírez', phone: '555-9012', status: 'active' },
-]
-
 export function DeliveryMen() {
-  const [deliveryMen, setDeliveryMen] = useState<DeliveryMan[]>(MOCK_DELIVERY_MEN)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [editingDeliveryMan, setEditingDeliveryMan] = useState<DeliveryMan | null>(null)
+  const [editingDeliveryMan, setEditingDeliveryMan] =
+    useState<DeliveryMan | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [page, setPage] = useState(1)
   const deliveryMenPerPage = 10
+
+  const { data: deliveryMenData, isLoading: isLoadingDeliveryMen } =
+    useGetDeliveryMenQuery()
+  const { mutateAsync: createDeliveryManFn } = useCreateDeliveryManMutation()
+  const { mutateAsync: updateDeliveryManFn } = useUpdateDeliveryManMutation()
+  const { mutateAsync: deleteDeliveryManFn } = useDeleteDeliveryManMutation()
+  const { mutateAsync: toggleDeliveryManStatusFn } =
+    useToggleDeliveryManStatusMutation()
+
+  const deliveryMen = deliveryMenData?.deliveryMen ?? []
 
   const filteredDeliveryMen = deliveryMen
     .filter((deliveryMan) =>
@@ -79,34 +84,39 @@ export function DeliveryMen() {
     page * deliveryMenPerPage,
   )
 
-  function handleCreateDeliveryMan(newDeliveryMan: Omit<DeliveryMan, 'id'>) {
-    const id = String(deliveryMen.length + 1)
-    setDeliveryMen((prev) => [...prev, { id, ...newDeliveryMan, status: 'active' }])
+  async function handleCreateDeliveryMan(
+    newDeliveryMan: Omit<DeliveryMan, 'id' | 'status'>,
+  ) {
+    await createDeliveryManFn(newDeliveryMan)
     setIsDialogOpen(false)
   }
 
-  function handleUpdateDeliveryMan(updatedDeliveryMan: DeliveryMan) {
-    setDeliveryMen(
-      deliveryMen.map((dm) =>
-        dm.id === updatedDeliveryMan.id ? updatedDeliveryMan : dm,
-      ),
-    )
+  async function handleUpdateDeliveryMan(
+    updatedDeliveryMan: Omit<DeliveryMan, 'status'>,
+  ) {
+    if (!editingDeliveryMan) return
+    await updateDeliveryManFn({
+      id: updatedDeliveryMan.id,
+      payload: {
+        name: updatedDeliveryMan.name,
+        phone: updatedDeliveryMan.phone,
+      },
+    })
     setEditingDeliveryMan(null)
     setIsDialogOpen(false)
   }
 
-  function handleDeleteDeliveryMan(id: string) {
-    setDeliveryMen(deliveryMen.filter((dm) => dm.id !== id))
+  async function handleDeleteDeliveryMan(id: string) {
+    await deleteDeliveryManFn(id)
   }
 
-  function handleToggleStatus(id: string, status: boolean) {
-    setDeliveryMen((prev) =>
-      prev.map((deliveryMan) =>
-        deliveryMan.id === id
-          ? { ...deliveryMan, status: status ? 'active' : 'inactive' }
-          : deliveryMan,
-      ),
-    )
+  async function handleToggleStatus(id: string, checked: boolean) {
+    const newStatus = checked ? 'active' : 'inactive'
+    await toggleDeliveryManStatusFn({ id, status: newStatus })
+  }
+
+  if (isLoadingDeliveryMen) {
+    return <div>Cargando repartidores...</div> // TODO: Replace with a skeleton loader
   }
 
   return (
@@ -131,7 +141,9 @@ export function DeliveryMen() {
               </DialogHeader>
               <CreateDeliveryMan
                 onCreate={
-                  editingDeliveryMan ? handleUpdateDeliveryMan : handleCreateDeliveryMan
+                  editingDeliveryMan
+                    ? handleUpdateDeliveryMan
+                    : handleCreateDeliveryMan
                 }
                 initialData={editingDeliveryMan}
               />
@@ -144,10 +156,7 @@ export function DeliveryMen() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <Select
-            value={statusFilter}
-            onValueChange={setStatusFilter}
-          >
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-[180px]">
               <SelectValue />
             </SelectTrigger>
