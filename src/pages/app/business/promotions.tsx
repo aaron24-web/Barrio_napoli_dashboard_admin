@@ -66,6 +66,19 @@ const promotionsData = [
     products: [1, 2, 4],
     imageUrl: 'https://via.placeholder.com/150/2196F3/FFFFFF?Text=Combo',
   },
+  {
+    id: 3,
+    name: '10% Descuento Bienvenida',
+    description: '10% de descuento en tu primera compra',
+    type: 'Cupón',
+    code: 'BIENVENIDO10',
+    conditions: 'Válido solo en la primera compra',
+    startDate: new Date(2024, 0, 1),
+    endDate: new Date(2024, 11, 31),
+    availability: true,
+    products: [],
+    imageUrl: 'https://via.placeholder.com/150/FF9800/FFFFFF?Text=Cupón',
+  },
 ]
 
 const initialProducts = [
@@ -201,7 +214,7 @@ export function Promotions() {
               <TableRow>
                 <TableHead className="w-24">Imagen</TableHead>
                 <TableHead>Nombre</TableHead>
-                <TableHead>Descripción</TableHead>
+                <TableHead>Código</TableHead>
                 <TableHead>Tipo</TableHead>
                 <TableHead>Duración</TableHead>
                 <TableHead>Disponibilidad</TableHead>
@@ -221,7 +234,7 @@ export function Promotions() {
                     )}
                   </TableCell>
                   <TableCell>{promotion.name}</TableCell>
-                  <TableCell>{promotion.description}</TableCell>
+                  <TableCell>{promotion.code || 'N/A'}</TableCell>
                   <TableCell>{promotion.type}</TableCell>
                   <TableCell>{`${promotion.startDate.toLocaleDateString()} - ${promotion.endDate.toLocaleDateString()}`}</TableCell>
                   <TableCell>

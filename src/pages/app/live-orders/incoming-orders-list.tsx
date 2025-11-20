@@ -7,6 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { Timer } from '@/components/timer'
 import { PaginatedOrders } from '@/core/models'
 
 interface IncomingOrdersListProps {
@@ -26,13 +27,14 @@ export function IncomingOrdersList({
             <TableHead className="w-[64px]"></TableHead>
             <TableHead className="w-[140px]">N.º de orden</TableHead>
             <TableHead className="w-[180px]">Cliente</TableHead>
+            <TableHead className="w-[110px]">Tiempo</TableHead>
             <TableHead className="w-[140px]">Estado</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {!orders?.results && (
             <TableRow>
-              <TableCell colSpan={4} className="text-center">
+              <TableCell colSpan={5} className="text-center">
                 Cargando pedidos...
               </TableCell>
             </TableRow>
@@ -52,13 +54,16 @@ export function IncomingOrdersList({
                   {order.customerName}
                 </TableCell>
                 <TableCell>
+                  <Timer startTime={order.createdAt} />
+                </TableCell>
+                <TableCell>
                   <OrderStatus status={order.status} />
                 </TableCell>
               </TableRow>
             ))}
           {orders?.results && orders.results.length === 0 && (
             <TableRow>
-              <TableCell colSpan={4} className="text-center">
+              <TableCell colSpan={5} className="text-center">
                 No hay pedidos entrantes.
               </TableCell>
             </TableRow>

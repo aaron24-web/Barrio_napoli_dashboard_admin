@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { memo } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { DateRange } from 'react-day-picker'
 
 import { ImageUploader } from '@/components/image-uploader'
 import { Button } from '@/components/ui/button'
@@ -24,19 +25,35 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
-const promotionFormSchema = z.object({
-  name: z.string().min(3, 'El nombre es requerido.'),
-  description: z.string().optional(),
-  type: z.string(),
-  discount: z.coerce.number().optional(),
-  products: z.array(z.string()),
-  conditions: z.string().optional(),
-  dateRange: z.object({
-    from: z.date().optional(),
-    to: z.date().optional(),
-  }),
-  image: z.instanceof(File).optional(),
-})
+const promotionFormSchema = z
+  .object({
+    name: z.string().min(3, 'El nombre es requerido.'),
+    description: z.string().optional(),
+    type: z.string(),
+    code: z.string().optional(),
+    discount: z.coerce.number().optional(),
+    products: z.array(z.string()),
+    conditions: z.string().optional(),
+    dateRange: z
+      .object({
+        from: z.date().optional(),
+        to: z.date().optional(),
+      })
+      .optional(),
+    image: z.instanceof(File).optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.type === 'Cupón' && (!data.code || data.code.length < 3)) {
+        return false
+      }
+      return true
+    },
+    {
+      message: 'El código es requerido para los cupones (mín. 3 caracteres).',
+      path: ['code'],
+    },
+  )
 
 type PromotionFormValues = z.infer<typeof promotionFormSchema>
 
@@ -52,6 +69,7 @@ function PromotionFormComponent({
       name: promotion?.name || '',
       description: promotion?.description || '',
       type: promotion?.type || 'Oferta Especial',
+      code: promotion?.code || '',
       discount: promotion?.discount || undefined,
       products: promotion?.products?.map(String) || [],
       conditions: promotion?.conditions || '',
@@ -68,11 +86,26 @@ function PromotionFormComponent({
     onSubmit({
       id: promotion?.id,
       ...data,
-      startDate: data.dateRange.from,
-      endDate: data.dateRange.to,
+      startDate: data.dateRange?.from,
+      endDate: data.dateRange?.to,
       availability: promotion?.availability || false,
       products: data.products.map(Number),
     })
+  }
+
+  function generateCouponCode() {
+    const code = Math.random().toString(36).substring(2, 10).toUpperCase()
+    form.setValue('code', code)
+  }
+
+  // Handler explícito para MultiSelect
+  function handleProductChange(selectedProducts: string[]) {
+    form.setValue('products', selectedProducts)
+  }
+
+  // Handler explícito para DateRangePicker
+  function handleDateChange(dateRange: DateRange | undefined) {
+    form.setValue('dateRange', dateRange)
   }
 
   return (
@@ -149,6 +182,31 @@ function PromotionFormComponent({
           )}
         />
 
+        {type === 'Cupón' && (
+          <FormField
+            control={form.control}
+            name="code"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Código del Cupón</FormLabel>
+                <div className="flex items-center gap-2">
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={generateCouponCode}
+                  >
+                    Generar
+                  </Button>
+                </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+
         {type === 'Descuento' && (
           <FormField
             control={form.control}
@@ -175,7 +233,7 @@ function PromotionFormComponent({
                 <MultiSelect
                   options={productOptions}
                   selected={field.value}
-                  onChange={field.onChange}
+                  onChange={handleProductChange}
                 />
               </FormControl>
               <FormMessage />
@@ -206,7 +264,7 @@ function PromotionFormComponent({
               <FormControl>
                 <DateRangePicker
                   date={field.value}
-                  onDateChange={field.onChange}
+                  onDateChange={handleDateChange}
                 />
               </FormControl>
               <FormMessage />

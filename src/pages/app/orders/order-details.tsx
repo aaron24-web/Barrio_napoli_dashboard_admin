@@ -5,6 +5,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 import { OrderStatus } from '@/components/order-status'
+import { Timer } from '@/components/timer'
 import { Button } from '@/components/ui/button'
 import {
   Select,
@@ -81,6 +82,26 @@ export function OrderDetails({ orderId }: OrderDetailsProps) {
                     <OrderStatus status={order.status} />
                   </TableCell>
                 </TableRow>
+                {order.status === 'processing' && order.processingAt && (
+                  <TableRow>
+                    <TableCell className="text-muted-foreground">
+                      En preparación hace
+                    </TableCell>
+                    <TableCell className="flex justify-end">
+                      <Timer startTime={order.processingAt} />
+                    </TableCell>
+                  </TableRow>
+                )}
+                {order.status === 'delivering' && order.deliveringAt && (
+                  <TableRow>
+                    <TableCell className="text-muted-foreground">
+                      En reparto hace
+                    </TableCell>
+                    <TableCell className="flex justify-end">
+                      <Timer startTime={order.deliveringAt} />
+                    </TableCell>
+                  </TableRow>
+                )}
                 <TableRow>
                   <TableCell className="text-muted-foreground">Cliente</TableCell>
                   <TableCell className="flex justify-end">
@@ -153,7 +174,7 @@ export function OrderDetails({ orderId }: OrderDetailsProps) {
                       </TableCell>
                       <TableCell className="text-right">
                         {(
-                          (item.priceInCents * item.quantity) / 
+                          (item.priceInCents * item.quantity) /
                           100
                         ).toLocaleString('es-MX', {
                           style: 'currency',
