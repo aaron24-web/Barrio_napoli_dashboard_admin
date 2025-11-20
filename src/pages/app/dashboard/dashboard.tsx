@@ -5,24 +5,8 @@ import { toast } from 'sonner'
 import { DeliveryPersonInfo } from '@/pages/app/live-orders/delivery-person-info'
 import { OrderDetails } from '@/pages/app/orders/order-details'
 import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { Input } from '@/components/ui/input'
-import {
-  useAssignDeliveryManMutation,
-  useGetDeliveryMenQuery,
-} from '@/core/hooks/useDelivery'
-import {
-  useGetOrderDetailsQuery,
-  useGetOrdersQuery,
-} from '@/core/hooks/useOrders'
-import { DeliveryMan, DeliveryPerson, OrderStatusType } from '@/core/models'
+import { useGetOrdersQuery } from '@/core/hooks/useOrders'
+import { DeliveryPerson, OrderStatusType } from '@/core/models'
 
 import { DeliveryMap } from '../live-orders/delivery-map'
 import { IncomingOrdersList } from '../live-orders/incoming-orders-list'
@@ -32,15 +16,11 @@ export function Dashboard() {
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null)
   const [selectedDeliveryPerson, setSelectedDeliveryPerson] =
     useState<DeliveryPerson | null>(null)
-  const [driverSearchTerm, setDriverSearchTerm] = useState('')
 
   const { data: orders } = useGetOrdersQuery({
     page: 1,
     status: ['pending', 'processing', 'delivering'] as OrderStatusType[],
   })
-
-  const { data: deliveryMenData } = useGetDeliveryMenQuery()
-  const { mutateAsync: assignDeliveryMan } = useAssignDeliveryManMutation()
 
   useEffect(() => {
     if (
@@ -53,8 +33,6 @@ export function Dashboard() {
     }
   }, [orders, selectedOrderId, selectedDeliveryPerson])
 
-  const { data: selectedOrder } = useGetOrderDetailsQuery(selectedOrderId!)
-
   function handleSelectOrder(orderId: string) {
     setSelectedOrderId(orderId)
     setSelectedDeliveryPerson(null) // Close delivery person info
@@ -63,19 +41,6 @@ export function Dashboard() {
   function handleSelectDeliveryPerson(person: DeliveryPerson) {
     setSelectedDeliveryPerson(person)
     setSelectedOrderId(null) // Close order details
-  }
-
-  const filteredDrivers = (deliveryMenData?.deliveryMen ?? []).filter((driver) =>
-    driver.name.toLowerCase().includes(driverSearchTerm.toLowerCase()),
-  )
-
-  async function handleAssignDriver(driver: DeliveryMan) {
-    if (!selectedOrderId) return
-
-    await assignDeliveryMan({
-      orderId: selectedOrderId,
-      deliveryManId: driver.id,
-    })
   }
 
   function handleSimulateNewOrder() {
@@ -91,10 +56,6 @@ export function Dashboard() {
       },
     })
   }
-
-  const assignedDriver = (deliveryMenData?.deliveryMen ?? []).find(
-    (d) => d.id === selectedOrder?.deliveryManId,
-  )
 
   return (
     <>
@@ -116,66 +77,16 @@ export function Dashboard() {
             <DeliveryMap onSelectDeliveryPerson={handleSelectDeliveryPerson} />
           </div>
           <div className="col-span-3 flex flex-col gap-4">
-            {selectedOrder && (
+            {selectedOrderId && (
               <>
                 <OrderActionsPanel
-                  orderId={selectedOrder.orderId}
-                  status={selectedOrder.status}
+                  orderId={selectedOrderId}
+                  status={
+                    orders?.results.find((o) => o.orderId === selectedOrderId)
+                      ?.status ?? 'pending'
+                  }
                 />
-                <OrderDetails orderId={selectedOrder.orderId} />
-
-                <div className="mt-4 space-y-3">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button className="w-full">
-                        {assignedDriver
-                          ? 'Cambiar repartidor'
-                          : 'Asignar repartidor'}
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                      className="w-[300px] max-h-72 overflow-y-auto"
-                      side="bottom"
-                      sideOffset={5}
-                    >
-                      <DropdownMenuLabel>
-                        Seleccionar repartidor
-                      </DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <div className="p-2">
-                        <Input
-                          placeholder="Buscar repartidor..."
-                          value={driverSearchTerm}
-                          onChange={(e) =>
-                            setDriverSearchTerm(e.target.value)
-                          }
-                          className="mb-2"
-                        />
-                      </div>
-                      {filteredDrivers?.map((driver) => (
-                        <DropdownMenuItem
-                          key={driver.id}
-                          asChild
-                          onSelect={() => handleAssignDriver(driver)}
-                        >
-                          <Button
-                            variant="ghost"
-                            className="w-full justify-start"
-                          >
-                            {driver.name}
-                          </Button>
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-
-                  {assignedDriver && (
-                    <p className="text-sm font-medium flex items-center gap-2">
-                      <span className="text-lg">🚚</span> Repartidor asignado:{' '}
-                      {assignedDriver.name}
-                    </p>
-                  )}
-                </div>
+                <OrderDetails orderId={selectedOrderId} />
               </>
             )}
             {selectedDeliveryPerson && (

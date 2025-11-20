@@ -1,58 +1,111 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
 
+import { ImageUploader } from '@/components/image-uploader'
 import { Button } from '@/components/ui/button'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { CreateDeliveryManPayload, DeliveryMan } from '@/core/models/delivery.model'
+import {
+  CreateDeliveryManPayload,
+  DeliveryMan,
+} from '@/core/models/delivery.model'
 
 const createDeliveryManFormSchema = z.object({
   name: z.string().min(1, 'El nombre es obligatorio'),
   phone: z.string().min(1, 'El teléfono es obligatorio'),
+  image: z.instanceof(File).optional(),
 })
 
 type CreateDeliveryManForm = z.infer<typeof createDeliveryManFormSchema>
 
 interface CreateDeliveryManProps {
   onCreate: (deliveryMan: CreateDeliveryManPayload) => void
-  initialData?: DeliveryMan
+  initialData?: DeliveryMan | null
 }
 
-export function CreateDeliveryMan({ onCreate, initialData }: CreateDeliveryManProps) {
-  const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm<CreateDeliveryManForm>({
+export function CreateDeliveryMan({
+  onCreate,
+  initialData,
+}: CreateDeliveryManProps) {
+  const form = useForm<CreateDeliveryManForm>({
     resolver: zodResolver(createDeliveryManFormSchema),
+    defaultValues: {
+      name: initialData?.name || '',
+      phone: initialData?.phone || '',
+    },
   })
 
   useEffect(() => {
     if (initialData) {
-      setValue('name', initialData.name)
-      setValue('phone', initialData.phone)
+      form.reset({
+        name: initialData.name,
+        phone: initialData.phone,
+      })
     }
-  }, [initialData, setValue])
+  }, [initialData, form])
 
   function onSubmit(data: CreateDeliveryManForm) {
-    onCreate({
-      name: data.name,
-      phone: data.phone,
-    })
-    reset()
+    onCreate(data)
+    form.reset()
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="name">Nombre</Label>
-        <Input id="name" {...register('name')} />
-        {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="phone">Teléfono</Label>
-        <Input id="phone" type="tel" {...register('phone')} />
-        {errors.phone && <p className="text-red-500 text-sm">{errors.phone.message}</p>}
-      </div>
-      <Button type="submit" className="w-full">{initialData ? 'Guardar Cambios' : 'Agregar Repartidor'}</Button>
-    </form>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="image"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <ImageUploader
+                  onFileSelected={(file) => field.onChange(file)}
+                  initialImageUrl={initialData?.imageUrl}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Nombre</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="phone"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Teléfono</FormLabel>
+              <FormControl>
+                <Input type="tel" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit" className="w-full">
+          {initialData ? 'Guardar Cambios' : 'Agregar Repartidor'}
+        </Button>
+      </form>
+    </Form>
   )
 }

@@ -1,4 +1,4 @@
-import { http, HttpResponse } from 'msw'
+import { http, HttpResponse, passthrough } from 'msw'
 
 import { Order, PaginatedOrders } from '@/core/models'
 
@@ -43,6 +43,28 @@ export const handlers = [
     return HttpResponse.json(deliveryMenData)
   }),
 
+  http.put('/delivery-men/:id', async ({ request, params }) => {
+    const { id } = params
+    const { name, phone } = await request.json()
+    const deliveryManIndex = deliveryMenData.deliveryMen.findIndex(
+      (d) => d.id === id,
+    )
+
+    if (deliveryManIndex === -1) {
+      return new HttpResponse(null, { status: 404 })
+    }
+
+    const updatedDeliveryMan = {
+      ...deliveryMenData.deliveryMen[deliveryManIndex],
+      name,
+      phone,
+    }
+
+    deliveryMenData.deliveryMen[deliveryManIndex] = updatedDeliveryMan
+
+    return HttpResponse.json(updatedDeliveryMan)
+  }),
+
   http.get('http://localhost:3333/orders/:orderId', ({ params }) => {
     const { orderId } = params
     const order = ordersData.orders.find((o) => o.orderId === orderId)
@@ -73,4 +95,11 @@ export const handlers = [
   http.patch('http://localhost:3333/orders/:orderId/finish', () => {
     return new HttpResponse(null, { status: 204 })
   }),
+
+  http.patch(
+    'http://localhost:3333/orders/:orderId/assign-delivery-man',
+    () => {
+      return new HttpResponse(null, { status: 204 })
+    },
+  ),
 ]

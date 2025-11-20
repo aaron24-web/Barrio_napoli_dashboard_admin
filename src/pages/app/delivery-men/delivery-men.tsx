@@ -84,24 +84,28 @@ export function DeliveryMen() {
     page * deliveryMenPerPage,
   )
 
-  async function handleCreateDeliveryMan(
-    newDeliveryMan: Omit<DeliveryMan, 'id' | 'status'>,
-  ) {
-    await createDeliveryManFn(newDeliveryMan)
-    setIsDialogOpen(false)
-  }
+  async function handleCreateOrUpdateDeliveryMan(data: {
+    name: string
+    phone: string
+    image?: File | null
+    id?: string
+  }) {
+    // En un caso real, aquí se subiría la imagen a un servicio de almacenamiento
+    // y se obtendría una URL. Para la simulación, creamos una URL local.
+    const payload: any = {
+      name: data.name,
+      phone: data.phone,
+    }
 
-  async function handleUpdateDeliveryMan(
-    updatedDeliveryMan: Omit<DeliveryMan, 'status'>,
-  ) {
-    if (!editingDeliveryMan) return
-    await updateDeliveryManFn({
-      id: updatedDeliveryMan.id,
-      payload: {
-        name: updatedDeliveryMan.name,
-        phone: updatedDeliveryMan.phone,
-      },
-    })
+    if (editingDeliveryMan) {
+      await updateDeliveryManFn({
+        id: editingDeliveryMan.id,
+        payload,
+      })
+    } else {
+      await createDeliveryManFn(payload)
+    }
+
     setEditingDeliveryMan(null)
     setIsDialogOpen(false)
   }
@@ -127,7 +131,13 @@ export function DeliveryMen() {
           <h1 className="text-3xl font-bold tracking-tight">
             Gestión de repartidores
           </h1>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <Dialog
+            open={isDialogOpen}
+            onOpenChange={(open) => {
+              if (!open) setEditingDeliveryMan(null)
+              setIsDialogOpen(open)
+            }}
+          >
             <DialogTrigger asChild>
               <Button onClick={() => setEditingDeliveryMan(null)}>
                 Agregar Repartidor
@@ -136,15 +146,13 @@ export function DeliveryMen() {
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>
-                  {editingDeliveryMan ? 'Editar Repartidor' : 'Agregar Repartidor'}
+                  {editingDeliveryMan
+                    ? 'Editar Repartidor'
+                    : 'Agregar Repartidor'}
                 </DialogTitle>
               </DialogHeader>
               <CreateDeliveryMan
-                onCreate={
-                  editingDeliveryMan
-                    ? handleUpdateDeliveryMan
-                    : handleCreateDeliveryMan
-                }
+                onCreate={handleCreateOrUpdateDeliveryMan}
                 initialData={editingDeliveryMan}
               />
             </DialogContent>
@@ -171,6 +179,7 @@ export function DeliveryMen() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-24">Imagen</TableHead>
                 <TableHead>Nombre</TableHead>
                 <TableHead>Teléfono</TableHead>
                 <TableHead>Estado</TableHead>
@@ -180,6 +189,15 @@ export function DeliveryMen() {
             <TableBody>
               {paginatedDeliveryMen.map((deliveryMan) => (
                 <TableRow key={deliveryMan.id}>
+                  <TableCell>
+                    {deliveryMan.imageUrl && (
+                      <img
+                        src={deliveryMan.imageUrl}
+                        alt={deliveryMan.name}
+                        className="h-16 w-16 rounded-md object-cover"
+                      />
+                    )}
+                  </TableCell>
                   <TableCell>{deliveryMan.name}</TableCell>
                   <TableCell>{deliveryMan.phone}</TableCell>
                   <TableCell>
@@ -219,7 +237,9 @@ export function DeliveryMen() {
                         <AlertDialogFooter>
                           <AlertDialogCancel>Cancelar</AlertDialogCancel>
                           <AlertDialogAction
-                            onClick={() => handleDeleteDeliveryMan(deliveryMan.id)}
+                            onClick={() =>
+                              handleDeleteDeliveryMan(deliveryMan.id)
+                            }
                           >
                             Eliminar
                           </AlertDialogAction>

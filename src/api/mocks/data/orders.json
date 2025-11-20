@@ -15,13 +15,24 @@
         {
           "id": "item-1",
           "product": {
-            "name": "Pizza"
+            "name": "Pizza Napolitana"
           },
           "quantity": 2,
-          "priceInCents": 2000
+          "priceInCents": 2000,
+          "notes": "Extra bien cocida, por favor.",
+          "addons": [
+            {
+              "name": "Queso Extra",
+              "priceInCents": 100
+            },
+            {
+              "name": "Orilla de queso",
+              "priceInCents": 150
+            }
+          ]
         }
       ],
-      "totalInCents": 4000
+      "totalInCents": 4500
     },
     {
       "orderId": "order-2",
@@ -29,7 +40,7 @@
       "processingAt": "2025-11-19T14:56:00.000Z",
       "status": "processing",
       "customerName": "Customer 2",
-      "total": 3500,
+      "total": 3800,
       "customer": {
         "name": "Customer 2",
         "email": "customer2@example.com",
@@ -39,13 +50,20 @@
         {
           "id": "item-2",
           "product": {
-            "name": "Pasta"
+            "name": "Pasta Bolognesa"
           },
           "quantity": 1,
-          "priceInCents": 3500
+          "priceInCents": 3500,
+          "notes": "Sin cebolla.",
+          "addons": [
+            {
+              "name": "Pan de ajo",
+              "priceInCents": 300
+            }
+          ]
         }
       ],
-      "totalInCents": 3500
+      "totalInCents": 3800
     },
     {
       "orderId": "order-3",
@@ -64,10 +82,29 @@
         {
           "id": "item-3",
           "product": {
-            "name": "Salad"
+            "name": "Ensalada César"
           },
-          "quantity": 3,
-          "priceInCents": 2000
+          "quantity": 1,
+          "priceInCents": 6000,
+          "notes": "Entregar en la puerta trasera.",
+          "addons": []
+        }
+      ],
+      "chatHistory": [
+        {
+          "sender": "customer",
+          "text": "Hola, ¿ya vienes en camino?",
+          "timestamp": "2025-11-19T14:51:00.000Z"
+        },
+        {
+          "sender": "driver",
+          "text": "¡Hola! Sí, estoy a 5 minutos.",
+          "timestamp": "2025-11-19T14:52:00.000Z"
+        },
+        {
+          "sender": "customer",
+          "text": "Perfecto, gracias. El timbre no funciona, por favor llámame cuando llegues.",
+          "timestamp": "2025-11-19T14:52:30.000Z"
         }
       ],
       "totalInCents": 6000
@@ -87,10 +124,12 @@
         {
           "id": "item-4",
           "product": {
-            "name": "Drink"
+            "name": "Coca-Cola 600ml"
           },
           "quantity": 1,
-          "priceInCents": 2500
+          "priceInCents": 2500,
+          "addons": [],
+          "notes": ""
         }
       ],
       "totalInCents": 2500
@@ -110,10 +149,12 @@
         {
           "id": "item-5",
           "product": {
-            "name": "Dessert"
+            "name": "Tiramisú"
           },
           "quantity": 2,
-          "priceInCents": 2250
+          "priceInCents": 2250,
+          "addons": [],
+          "notes": ""
         }
       ],
       "totalInCents": 4500

@@ -3,7 +3,9 @@ import { formatDistanceToNow } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { useEffect, useState } from 'react'
 
+import { ChatBox } from '@/components/chat-box'
 import { OrderStatus } from '@/components/order-status'
 import { Timer } from '@/components/timer'
 import { Button } from '@/components/ui/button'
@@ -45,6 +47,11 @@ export function OrderDetails({ orderId }: OrderDetailsProps) {
   const { data: order } = useGetOrderDetailsQuery(orderId)
   const { data: deliveryMen } = useGetDeliveryMenQuery()
   const { mutateAsync: assignDeliveryManFn } = useAssignDeliveryManMutation()
+  const [chatMessages, setChatMessages] = useState(order?.chatHistory || [])
+
+  useEffect(() => {
+    setChatMessages(order?.chatHistory || [])
+  }, [order])
 
   const {
     handleSubmit,
@@ -66,6 +73,18 @@ export function OrderDetails({ orderId }: OrderDetailsProps) {
       orderId: order.orderId,
       deliveryManId: data.deliveryManId,
     })
+  }
+
+  function handleSendMessage(message: string) {
+    // En una app real, esto sería una mutación a la API
+    setChatMessages([
+      ...chatMessages,
+      {
+        sender: 'admin',
+        text: message,
+        timestamp: new Date().toISOString(),
+      },
+    ])
   }
 
   return (
@@ -150,16 +169,42 @@ export function OrderDetails({ orderId }: OrderDetailsProps) {
 
               <TableBody>
                 {order.orderItems.map((item) => {
+                  const addonsTotal =
+                    item.addons?.reduce(
+                      (acc, addon) => acc + addon.priceInCents,
+                      0,
+                    ) ?? 0
+                  const itemTotal =
+                    (item.priceInCents + addonsTotal) * item.quantity
+
                   return (
                     <TableRow key={item.id}>
                       <TableCell>
-                        <div>{item.product.name}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {item.product.description}
-                        </div>
-                        {item.product.notes && (
-                          <div className="text-xs text-muted-foreground">
-                            Observaciones: {item.product.notes}
+                        <div className="font-medium">{item.product.name}</div>
+                        {item.addons && item.addons.length > 0 && (
+                          <div className="ml-4 mt-1 space-y-1">
+                            {item.addons.map((addon) => (
+                              <div
+                                key={addon.name}
+                                className="text-xs text-muted-foreground"
+                              >
+                                + {addon.name} (
+                                {(addon.priceInCents / 100).toLocaleString(
+                                  'es-MX',
+                                  {
+                                    style: 'currency',
+                                    currency: 'MXN',
+                                  },
+                                )}
+                                )
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        {item.notes && (
+                          <div className="mt-2 text-xs text-gray-500">
+                            <span className="font-semibold">Nota:</span>{' '}
+                            {item.notes}
                           </div>
                         )}
                       </TableCell>
@@ -167,16 +212,16 @@ export function OrderDetails({ orderId }: OrderDetailsProps) {
                         {item.quantity}
                       </TableCell>
                       <TableCell className="text-right">
-                        {(item.priceInCents / 100).toLocaleString('es-MX', {
+                        {(
+                          (item.priceInCents + addonsTotal) /
+                          100
+                        ).toLocaleString('es-MX', {
                           style: 'currency',
                           currency: 'MXN',
                         })}
                       </TableCell>
                       <TableCell className="text-right">
-                        {(
-                          (item.priceInCents * item.quantity) /
-                          100
-                        ).toLocaleString('es-MX', {
+                        {(itemTotal / 100).toLocaleString('es-MX', {
                           style: 'currency',
                           currency: 'MXN',
                         })}
@@ -206,12 +251,19 @@ export function OrderDetails({ orderId }: OrderDetailsProps) {
               </TableFooter>
             </Table>
 
-            {['accepted', 'processing', 'delivering'].includes(order.status) && (
+            {order.chatHistory && (
+              <ChatBox
+                messages={chatMessages}
+                onSendMessage={handleSendMessage}
+              />
+            )}
+
+            {['pending', 'accepted', 'processing', 'delivering'].includes(
+              order.status,
+            ) && (
               <form onSubmit={handleSubmit(handleAssignDeliveryMan)}>
                 <div className="space-y-3">
-                  <h2 className="text-lg font-semibold">
-                    Asignar repartidor
-                  </h2>
+                  <h2 className="text-lg font-semibold">Asignar repartidor</h2>
                   <div className="flex items-center gap-2">
                     <Controller
                       name="deliveryManId"
@@ -252,3 +304,4 @@ export function OrderDetails({ orderId }: OrderDetailsProps) {
     </div>
   )
 }
+
