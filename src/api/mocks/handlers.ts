@@ -98,7 +98,24 @@ export const handlers = [
 
   http.patch(
     'http://localhost:3333/orders/:orderId/assign-delivery-man',
-    () => {
+    async ({ request, params }) => {
+      const { orderId } = params
+      const { deliveryManId } = await request.json()
+
+      const orderIndex = ordersData.orders.findIndex((o) => o.orderId === orderId)
+      if (orderIndex === -1) {
+        return new HttpResponse(null, { status: 404 })
+      }
+
+      const deliveryMan = deliveryMenData.deliveryMen.find(
+        (d) => d.id === deliveryManId,
+      )
+      if (!deliveryMan) {
+        return new HttpResponse(null, { status: 404 })
+      }
+
+      ordersData.orders[orderIndex].deliveryMan = deliveryMan
+
       return new HttpResponse(null, { status: 204 })
     },
   ),

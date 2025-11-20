@@ -290,7 +290,9 @@ export function OrderDetails({ orderId }: OrderDetailsProps) {
                       )}
                     />
                     <Button type="submit" disabled={isSubmitting}>
-                      Asignar repartidor
+                      {order.deliveryMan
+                        ? 'Cambiar repartidor'
+                        : 'Asignar repartidor'}
                     </Button>
                   </div>
                 </div>
