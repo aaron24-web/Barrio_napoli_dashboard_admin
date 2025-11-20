@@ -11,5 +11,7 @@ export async function enableMSW() {
     return
   }
 
-  await worker.start()
+  await worker.start({
+    onUnhandledRequest: 'bypass',
+  })
 }

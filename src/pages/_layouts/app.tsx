@@ -1,6 +1,7 @@
 import { isAxiosError } from 'axios'
 import { useEffect } from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
+import { Toaster } from 'sonner'
 
 import { Header } from '@/components/Header'
 import { apiClient } from '@/core/api/apiClient'
@@ -30,6 +31,7 @@ export function AppLayout() {
 
   return (
     <div className="flex min-h-screen flex-col antialiased">
+      <Toaster richColors />
       <Header />
 
       <div className="flex flex-1 flex-col gap-4 p-8 pt-6">

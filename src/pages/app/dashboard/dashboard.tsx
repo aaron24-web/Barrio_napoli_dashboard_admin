@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Helmet } from 'react-helmet-async'
+import { toast } from 'sonner'
 
 import { DeliveryPersonInfo } from '@/pages/app/live-orders/delivery-person-info'
 import { OrderDetails } from '@/pages/app/orders/order-details'
@@ -78,6 +79,20 @@ export function Dashboard() {
     setIsAssignDriverModalOpen(false)
   }
 
+  function handleSimulateNewOrder() {
+    // Audio playback for notification sound
+    // Note: Browsers may block autoplay until the user interacts with the page.
+    new Audio('/SD_ALERT_33.mp3').play()
+
+    toast.success('Nuevo pedido recibido!', {
+      description: 'Pedido #12345-abcde acaba de llegar.',
+      action: {
+        label: 'Ver pedido',
+        onClick: () => console.log('Ir al pedido #12345-abcde'),
+      },
+    })
+  }
+
   const assignedDriver = (deliveryMenData?.deliveryMen ?? []).find(
     (d) => d.id === selectedOrder?.deliveryManId,
   )
@@ -86,7 +101,10 @@ export function Dashboard() {
     <>
       <Helmet title="Panel de control" />
       <div className="flex flex-col gap-4">
-        <h1 className="text-3xl font-bold tracking-tight">Panel de control</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold tracking-tight">Panel de control</h1>
+          <Button onClick={handleSimulateNewOrder}>Simular Nuevo Pedido</Button>
+        </div>
 
         <div className="grid grid-cols-12 gap-4">
           <div className="col-span-3">
