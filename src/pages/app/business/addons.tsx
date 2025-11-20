@@ -1,6 +1,10 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { Helmet } from 'react-helmet-async'
+import { z } from 'zod'
 
+import { ImageUploader } from '@/components/image-uploader'
 import { Pagination } from '@/components/pagination'
 import {
   AlertDialog,
@@ -21,8 +25,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
@@ -47,6 +58,7 @@ const initialAddons = [
     price: 10,
     availability: true,
     category: 'Pizzas',
+    imageUrl: 'https://via.placeholder.com/150/FBC02D/000000?Text=Queso',
   },
   {
     id: 2,
@@ -54,18 +66,20 @@ const initialAddons = [
     price: 15,
     availability: true,
     category: 'Pizzas',
+    imageUrl: 'https://via.placeholder.com/150/D32F2F/FFFFFF?Text=Peperoni',
   },
-  {
-    id: 3,
-    name: 'Masa Delgada',
-    price: 0,
-    availability: false,
-    category: 'Pizzas',
-  },
-  { id: 4, name: 'Hielo', price: 2, availability: true, category: 'Bebidas' },
 ]
 
 const initialCategories = ['Pizzas', 'Bebidas', 'Postres']
+
+const addonFormSchema = z.object({
+  name: z.string().min(3, 'El nombre debe tener al menos 3 caracteres.'),
+  price: z.coerce.number().min(0, 'El precio debe ser un número positivo.'),
+  category: z.string(),
+  image: z.instanceof(File).optional(),
+})
+
+type AddonFormValues = z.infer<typeof addonFormSchema>
 
 export function Addons() {
   const [addons, setAddons] = useState(() => {
@@ -103,13 +117,25 @@ export function Addons() {
     page * addonsPerPage,
   )
 
-  function handleCreateAddon(newAddon: any) {
-    setAddons([...addons, { ...newAddon, id: addons.length + 1 }])
-    setIsDialogOpen(false)
-  }
-
-  function handleUpdateAddon(updatedAddon: any) {
-    setAddons(addons.map((a) => (a.id === updatedAddon.id ? updatedAddon : a)))
+  function handleAddonSubmit(data: any) {
+    if (editingAddon) {
+      const imageUrl = data.image
+        ? URL.createObjectURL(data.image)
+        : editingAddon.imageUrl
+      setAddons(
+        addons.map((a) =>
+          a.id === editingAddon.id
+            ? { ...editingAddon, ...data, imageUrl }
+            : a,
+        ),
+      )
+    } else {
+      const imageUrl = data.image ? URL.createObjectURL(data.image) : null
+      setAddons([
+        ...addons,
+        { ...data, id: addons.length + 1, availability: true, imageUrl },
+      ])
+    }
     setEditingAddon(null)
     setIsDialogOpen(false)
   }
@@ -130,7 +156,13 @@ export function Addons() {
           <h1 className="text-3xl font-bold tracking-tight">
             Gestión de Complementos
           </h1>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <Dialog
+            open={isDialogOpen}
+            onOpenChange={(open) => {
+              if (!open) setEditingAddon(null)
+              setIsDialogOpen(open)
+            }}
+          >
             <DialogTrigger asChild>
               <Button onClick={() => setEditingAddon(null)}>
                 Crear Complemento
@@ -143,8 +175,9 @@ export function Addons() {
                 </DialogTitle>
               </DialogHeader>
               <AddonForm
+                key={editingAddon?.id || 'new'}
                 addon={editingAddon}
-                onSubmit={editingAddon ? handleUpdateAddon : handleCreateAddon}
+                onSubmit={handleAddonSubmit}
                 onCancel={() => setIsDialogOpen(false)}
                 categories={categories}
               />
@@ -175,6 +208,7 @@ export function Addons() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-24">Imagen</TableHead>
                 <TableHead>Nombre</TableHead>
                 <TableHead>Precio</TableHead>
                 <TableHead>Categoría</TableHead>
@@ -185,6 +219,15 @@ export function Addons() {
             <TableBody>
               {paginatedAddons.map((addon) => (
                 <TableRow key={addon.id}>
+                  <TableCell>
+                    {addon.imageUrl && (
+                      <img
+                        src={addon.imageUrl}
+                        alt={addon.name}
+                        className="h-16 w-16 rounded-md object-cover"
+                      />
+                    )}
+                  </TableCell>
                   <TableCell>{addon.name}</TableCell>
                   <TableCell>${addon.price}</TableCell>
                   <TableCell>{addon.category}</TableCell>
@@ -250,61 +293,101 @@ export function Addons() {
 }
 
 function AddonForm({ addon, onSubmit, onCancel, categories }) {
-  const [name, setName] = useState(addon?.name || '')
-  const [price, setPrice] = useState(addon?.price || '')
-  const [category, setCategory] = useState(addon?.category || categories[0])
+  const form = useForm<AddonFormValues>({
+    resolver: zodResolver(addonFormSchema),
+    defaultValues: {
+      name: addon?.name || '',
+      price: addon?.price || 0,
+      category: addon?.category || categories[0],
+    },
+  })
 
-  function handleSubmit(e) {
-    e.preventDefault()
-    onSubmit({
-      id: addon?.id,
-      name,
-      price: parseInt(price),
-      category,
-      availability: addon?.availability || false,
-    })
+  function handleFormSubmit(data: AddonFormValues) {
+    onSubmit(data)
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <Label htmlFor="name">Nombre</Label>
-        <Input
-          id="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(handleFormSubmit)}
+        className="space-y-4"
+      >
+        <FormField
+          control={form.control}
+          name="image"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <ImageUploader
+                  onFileSelected={(file) => field.onChange(file)}
+                  initialImageUrl={addon?.imageUrl}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
-      <div>
-        <Label htmlFor="price">Precio</Label>
-        <Input
-          id="price"
-          type="number"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
+
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Nombre</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
-      <div>
-        <Label htmlFor="category">Categoría</Label>
-        <Select value={category} onValueChange={setCategory}>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {categories.map((c) => (
-              <SelectItem key={c} value={c}>
-                {c}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-      <div className="flex justify-end gap-2">
-        <Button type="button" variant="ghost" onClick={onCancel}>
-          Cancelar
-        </Button>
-        <Button type="submit">Guardar</Button>
-      </div>
-    </form>
+
+        <FormField
+          control={form.control}
+          name="price"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Precio</FormLabel>
+              <FormControl>
+                <Input type="number" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="category"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Categoría a la que pertenece</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {categories.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {c}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <div className="flex justify-end gap-2">
+          <Button type="button" variant="ghost" onClick={onCancel}>
+            Cancelar
+          </Button>
+          <Button type="submit">Guardar</Button>
+        </div>
+      </form>
+    </Form>
   )
 }

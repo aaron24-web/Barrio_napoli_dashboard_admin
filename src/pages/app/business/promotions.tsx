@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 
 import { Pagination } from '@/components/pagination'
@@ -52,6 +52,7 @@ const promotionsData = [
     endDate: new Date(2024, 10, 15),
     availability: true,
     products: [1, 2],
+    imageUrl: 'https://via.placeholder.com/150/4CAF50/FFFFFF?Text=2x1',
   },
   {
     id: 2,
@@ -63,29 +64,7 @@ const promotionsData = [
     endDate: new Date(2024, 10, 31),
     availability: true,
     products: [1, 2, 4],
-  },
-  {
-    id: 3,
-    name: 'DTO10',
-    description: '10% de descuento en tu compra total',
-    type: 'Cupón',
-    conditions: 'Válido solo en compras mayores a $200',
-    startDate: new Date(2024, 11, 1),
-    endDate: new Date(2024, 11, 31),
-    availability: false,
-    products: [],
-  },
-  {
-    id: 4,
-    name: '20% en Pizzas',
-    description: '20% de descuento en todas las pizzas',
-    type: 'Descuento',
-    conditions: 'No aplica con otras promociones',
-    startDate: new Date(2024, 11, 1),
-    endDate: new Date(2024, 11, 15),
-    availability: true,
-    products: [1, 2, 3],
-    discount: 20,
+    imageUrl: 'https://via.placeholder.com/150/2196F3/FFFFFF?Text=Combo',
   },
 ]
 
@@ -93,51 +72,20 @@ const initialProducts = [
   {
     id: 1,
     name: 'Pizza Napolitana',
-    price: 150,
-    availability: true,
-    category: 'Pizzas',
-    addons: [1, 2],
   },
   {
     id: 2,
     name: 'Pizza Diavola',
-    price: 160,
-    availability: true,
-    category: 'Pizzas',
-    addons: [1, 2],
-  },
-  {
-    id: 3,
-    name: 'Pizza Margherita',
-    price: 140,
-    availability: false,
-    category: 'Pizzas',
-    addons: [1],
   },
   {
     id: 4,
     name: 'Coca-Cola',
-    price: 20,
-    availability: true,
-    category: 'Bebidas',
-    addons: [4],
-  },
-  {
-    id: 5,
-    name: 'Tiramisú',
-    price: 50,
-    availability: true,
-    category: 'Postres',
-    addons: [],
   },
 ]
 
 export function Promotions() {
   const [promotions, setPromotions] = useState(promotionsData)
-  const [products, setProducts] = useState(() => {
-    const storedProducts = localStorage.getItem('products')
-    return storedProducts ? JSON.parse(storedProducts) : initialProducts
-  })
+  const [products] = useState(initialProducts)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingPromotion, setEditingPromotion] = useState<any | null>(null)
   const [search, setSearch] = useState('')
@@ -154,20 +102,25 @@ export function Promotions() {
     page * promotionsPerPage,
   )
 
-  function handleCreatePromotion(newPromotion: any) {
-    setPromotions([
-      ...promotions,
-      { ...newPromotion, id: promotions.length + 1 },
-    ])
-    setIsDialogOpen(false)
-  }
-
-  function handleUpdatePromotion(updatedPromotion: any) {
-    setPromotions(
-      promotions.map((p) =>
-        p.id === updatedPromotion.id ? updatedPromotion : p,
-      ),
-    )
+  function handlePromotionSubmit(data: any) {
+    if (editingPromotion) {
+      const imageUrl = data.image
+        ? URL.createObjectURL(data.image)
+        : editingPromotion.imageUrl
+      setPromotions(
+        promotions.map((p) =>
+          p.id === editingPromotion.id
+            ? { ...editingPromotion, ...data, imageUrl }
+            : p,
+        ),
+      )
+    } else {
+      const imageUrl = data.image ? URL.createObjectURL(data.image) : null
+      setPromotions([
+        ...promotions,
+        { ...data, id: promotions.length + 1, availability: true, imageUrl },
+      ])
+    }
     setEditingPromotion(null)
     setIsDialogOpen(false)
   }
@@ -195,7 +148,13 @@ export function Promotions() {
           <h1 className="text-3xl font-bold tracking-tight">
             Gestión de Promociones
           </h1>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <Dialog
+            open={isDialogOpen}
+            onOpenChange={(open) => {
+              if (!open) setEditingPromotion(null)
+              setIsDialogOpen(open)
+            }}
+          >
             <DialogTrigger asChild>
               <Button onClick={() => setEditingPromotion(null)}>
                 Crear Promoción
@@ -208,12 +167,9 @@ export function Promotions() {
                 </DialogTitle>
               </DialogHeader>
               <PromotionForm
+                key={editingPromotion?.id || 'new'}
                 promotion={editingPromotion}
-                onSubmit={
-                  editingPromotion
-                    ? handleUpdatePromotion
-                    : handleCreatePromotion
-                }
+                onSubmit={handlePromotionSubmit}
                 onCancel={() => setIsDialogOpen(false)}
                 productOptions={productOptions}
               />
@@ -243,6 +199,7 @@ export function Promotions() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-24">Imagen</TableHead>
                 <TableHead>Nombre</TableHead>
                 <TableHead>Descripción</TableHead>
                 <TableHead>Tipo</TableHead>
@@ -254,6 +211,15 @@ export function Promotions() {
             <TableBody>
               {paginatedPromotions.map((promotion) => (
                 <TableRow key={promotion.id}>
+                  <TableCell>
+                    {promotion.imageUrl && (
+                      <img
+                        src={promotion.imageUrl}
+                        alt={promotion.name}
+                        className="h-16 w-16 rounded-md object-cover"
+                      />
+                    )}
+                  </TableCell>
                   <TableCell>{promotion.name}</TableCell>
                   <TableCell>{promotion.description}</TableCell>
                   <TableCell>{promotion.type}</TableCell>

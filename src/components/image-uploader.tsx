@@ -1,12 +1,12 @@
 import { ChangeEvent, useMemo, useState } from 'react'
-import { FileImage, Upload } from 'lucide-react'
+import { FileImage, Upload, X } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 
 interface ImageUploaderProps {
-  onFileSelected: (file: File) => void
+  onFileSelected: (file: File | null) => void
   initialImageUrl?: string | null
 }
 
@@ -30,6 +30,11 @@ export function ImageUploader({
     setPreview(previewUrl)
   }
 
+  function handleRemoveImage() {
+    setPreview(null)
+    onFileSelected(null)
+  }
+
   const previewContent = useMemo(() => {
     if (preview) {
       return (
@@ -41,12 +46,12 @@ export function ImageUploader({
           />
           <Button
             type="button"
-            variant="destructive"
-            size="sm"
-            onClick={() => setPreview(null)}
-            className="absolute right-2 top-2"
+            variant="ghost"
+            size="icon"
+            onClick={handleRemoveImage}
+            className="absolute right-2 top-2 rounded-full bg-black/70 text-white hover:bg-black/80 hover:text-white"
           >
-            Remover
+            <X className="h-4 w-4" />
           </Button>
         </div>
       )

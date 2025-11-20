@@ -1,6 +1,10 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { Helmet } from 'react-helmet-async'
+import { z } from 'zod'
 
+import { ImageUploader } from '@/components/image-uploader'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,8 +24,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import {
   Table,
   TableBody,
@@ -32,10 +43,29 @@ import {
 } from '@/components/ui/table'
 
 const initialCategories = [
-  { id: 1, name: 'Pizzas' },
-  { id: 2, name: 'Bebidas' },
-  { id: 3, name: 'Postres' },
+  {
+    id: 1,
+    name: 'Pizzas',
+    imageUrl: 'https://via.placeholder.com/150/0000FF/FFFFFF?Text=Pizzas',
+  },
+  {
+    id: 2,
+    name: 'Bebidas',
+    imageUrl: 'https://via.placeholder.com/150/FF0000/FFFFFF?Text=Bebidas',
+  },
+  {
+    id: 3,
+    name: 'Postres',
+    imageUrl: 'https://via.placeholder.com/150/00FF00/FFFFFF?Text=Postres',
+  },
 ]
+
+const categoryFormSchema = z.object({
+  name: z.string().min(3, 'El nombre debe tener al menos 3 caracteres.'),
+  image: z.instanceof(File).optional(),
+})
+
+type CategoryFormValues = z.infer<typeof categoryFormSchema>
 
 export function Categories() {
   const [categories, setCategories] = useState(() => {
@@ -49,20 +79,25 @@ export function Categories() {
     localStorage.setItem('categories', JSON.stringify(categories))
   }, [categories])
 
-  function handleCreateCategory(newCategory: any) {
-    setCategories([
-      ...categories,
-      { ...newCategory, id: categories.length + 1 },
-    ])
-    setIsDialogOpen(false)
-  }
-
-  function handleUpdateCategory(updatedCategory: any) {
-    setCategories(
-      categories.map((c) =>
-        c.id === updatedCategory.id ? updatedCategory : c,
-      ),
-    )
+  function handleCategorySubmit(data: any) {
+    if (editingCategory) {
+      const imageUrl = data.image
+        ? URL.createObjectURL(data.image)
+        : editingCategory.imageUrl
+      setCategories(
+        categories.map((c) =>
+          c.id === editingCategory.id
+            ? { ...editingCategory, ...data, imageUrl }
+            : c,
+        ),
+      )
+    } else {
+      const imageUrl = data.image ? URL.createObjectURL(data.image) : null
+      setCategories([
+        ...categories,
+        { ...data, id: categories.length + 1, imageUrl },
+      ])
+    }
     setEditingCategory(null)
     setIsDialogOpen(false)
   }
@@ -79,7 +114,13 @@ export function Categories() {
           <h1 className="text-3xl font-bold tracking-tight">
             Gestión de Categorías
           </h1>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <Dialog
+            open={isDialogOpen}
+            onOpenChange={(open) => {
+              if (!open) setEditingCategory(null)
+              setIsDialogOpen(open)
+            }}
+          >
             <DialogTrigger asChild>
               <Button onClick={() => setEditingCategory(null)}>
                 Crear Categoría
@@ -92,10 +133,9 @@ export function Categories() {
                 </DialogTitle>
               </DialogHeader>
               <CategoryForm
+                key={editingCategory?.id || 'new'}
                 category={editingCategory}
-                onSubmit={
-                  editingCategory ? handleUpdateCategory : handleCreateCategory
-                }
+                onSubmit={handleCategorySubmit}
                 onCancel={() => setIsDialogOpen(false)}
               />
             </DialogContent>
@@ -105,6 +145,7 @@ export function Categories() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-24">Imagen</TableHead>
                 <TableHead>Nombre</TableHead>
                 <TableHead>Acciones</TableHead>
               </TableRow>
@@ -112,6 +153,15 @@ export function Categories() {
             <TableBody>
               {categories.map((category) => (
                 <TableRow key={category.id}>
+                  <TableCell>
+                    {category.imageUrl && (
+                      <img
+                        src={category.imageUrl}
+                        alt={category.name}
+                        className="h-16 w-16 rounded-md object-cover"
+                      />
+                    )}
+                  </TableCell>
                   <TableCell>{category.name}</TableCell>
                   <TableCell>
                     <Button
@@ -161,29 +211,60 @@ export function Categories() {
 }
 
 function CategoryForm({ category, onSubmit, onCancel }) {
-  const [name, setName] = useState(category?.name || '')
+  const form = useForm<CategoryFormValues>({
+    resolver: zodResolver(categoryFormSchema),
+    defaultValues: {
+      name: category?.name || '',
+    },
+  })
 
-  function handleSubmit(e) {
-    e.preventDefault()
-    onSubmit({ id: category?.id, name })
+  function handleFormSubmit(data: CategoryFormValues) {
+    onSubmit(data)
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <Label htmlFor="name">Nombre</Label>
-        <Input
-          id="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(handleFormSubmit)}
+        className="space-y-4"
+      >
+        <FormField
+          control={form.control}
+          name="image"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <ImageUploader
+                  onFileSelected={(file) => field.onChange(file)}
+                  initialImageUrl={category?.imageUrl}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
-      <div className="flex justify-end gap-2">
-        <Button type="button" variant="ghost" onClick={onCancel}>
-          Cancelar
-        </Button>
-        <Button type="submit">Guardar</Button>
-      </div>
-    </form>
+
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Nombre</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <div className="flex justify-end gap-2">
+          <Button type="button" variant="ghost" onClick={onCancel}>
+            Cancelar
+          </Button>
+          <Button type="submit">Guardar</Button>
+        </div>
+      </form>
+    </Form>
   )
 }

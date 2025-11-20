@@ -1,10 +1,21 @@
-import { memo, useState } from 'react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { memo } from 'react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
 
+import { ImageUploader } from '@/components/image-uploader'
 import { Button } from '@/components/ui/button'
 import { DateRangePicker } from '@/components/ui/date-range-picker'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { MultiSelect, MultiSelectOption } from '@/components/ui/multi-select'
+import { MultiSelect } from '@/components/ui/multi-select'
 import {
   Select,
   SelectContent,
@@ -13,111 +24,204 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
+const promotionFormSchema = z.object({
+  name: z.string().min(3, 'El nombre es requerido.'),
+  description: z.string().optional(),
+  type: z.string(),
+  discount: z.coerce.number().optional(),
+  products: z.array(z.string()),
+  conditions: z.string().optional(),
+  dateRange: z.object({
+    from: z.date().optional(),
+    to: z.date().optional(),
+  }),
+  image: z.instanceof(File).optional(),
+})
+
+type PromotionFormValues = z.infer<typeof promotionFormSchema>
+
 function PromotionFormComponent({
   promotion,
   onSubmit,
   onCancel,
   productOptions,
 }) {
-  const [name, setName] = useState(promotion?.name || '')
-  const [description, setDescription] = useState(promotion?.description || '')
-  const [type, setType] = useState(promotion?.type || 'Oferta Especial')
-  const [conditions, setConditions] = useState(promotion?.conditions || '')
-  const [dateRange, setDateRange] = useState<any>({
-    from: promotion?.startDate,
-    to: promotion?.endDate,
+  const form = useForm<PromotionFormValues>({
+    resolver: zodResolver(promotionFormSchema),
+    defaultValues: {
+      name: promotion?.name || '',
+      description: promotion?.description || '',
+      type: promotion?.type || 'Oferta Especial',
+      discount: promotion?.discount || undefined,
+      products: promotion?.products?.map(String) || [],
+      conditions: promotion?.conditions || '',
+      dateRange: {
+        from: promotion?.startDate ? new Date(promotion.startDate) : undefined,
+        to: promotion?.endDate ? new Date(promotion.endDate) : undefined,
+      },
+    },
   })
-  const [selectedProducts, setSelectedProducts] = useState<string[]>(
-    promotion?.products?.map((p) => p.toString()) || [],
-  )
-  const [discount, setDiscount] = useState(promotion?.discount || '')
 
-  function handleSubmit(e) {
-    e.preventDefault()
+  const type = form.watch('type')
+
+  function handleFormSubmit(data: PromotionFormValues) {
     onSubmit({
       id: promotion?.id,
-      name,
-      description,
-      type,
-      conditions,
-      startDate: dateRange.from,
-      endDate: dateRange.to,
+      ...data,
+      startDate: data.dateRange.from,
+      endDate: data.dateRange.to,
       availability: promotion?.availability || false,
-      products: selectedProducts.map((p) => parseInt(p)),
-      discount: type === 'Descuento' ? parseInt(discount) : undefined,
+      products: data.products.map(Number),
     })
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <Label htmlFor="name">Nombre</Label>
-        <Input
-          id="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(handleFormSubmit)}
+        className="space-y-4"
+      >
+        <FormField
+          control={form.control}
+          name="image"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <ImageUploader
+                  onFileSelected={(file) => field.onChange(file)}
+                  initialImageUrl={promotion?.imageUrl}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
-      <div>
-        <Label htmlFor="description">Descripción</Label>
-        <Input
-          id="description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
+
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Nombre</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
-      <div>
-        <Label htmlFor="type">Tipo</Label>
-        <Select value={type} onValueChange={setType}>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="Oferta Especial">Oferta Especial</SelectItem>
-            <SelectItem value="Combo">Combo</SelectItem>
-            <SelectItem value="Cupón">Cupón</SelectItem>
-            <SelectItem value="Descuento">Descuento</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      {type === 'Descuento' && (
-        <div>
-          <Label htmlFor="discount">Porcentaje de Descuento</Label>
-          <Input
-            id="discount"
-            type="number"
-            value={discount}
-            onChange={(e) => setDiscount(e.target.value)}
+
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Descripción</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="type"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Tipo</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="Oferta Especial">Oferta Especial</SelectItem>
+                  <SelectItem value="Combo">Combo</SelectItem>
+                  <SelectItem value="Cupón">Cupón</SelectItem>
+                  <SelectItem value="Descuento">Descuento</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {type === 'Descuento' && (
+          <FormField
+            control={form.control}
+            name="discount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Porcentaje de Descuento</FormLabel>
+                <FormControl>
+                  <Input type="number" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
+        )}
+
+        <FormField
+          control={form.control}
+          name="products"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Productos</FormLabel>
+              <FormControl>
+                <MultiSelect
+                  options={productOptions}
+                  selected={field.value}
+                  onChange={field.onChange}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="conditions"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Condiciones</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="dateRange"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Duración</FormLabel>
+              <FormControl>
+                <DateRangePicker
+                  date={field.value}
+                  onDateChange={field.onChange}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <div className="flex justify-end gap-2">
+          <Button type="button" variant="ghost" onClick={onCancel}>
+            Cancelar
+          </Button>
+          <Button type="submit">Guardar</Button>
         </div>
-      )}
-      <div>
-        <Label>Productos</Label>
-        <MultiSelect
-          options={productOptions}
-          selected={selectedProducts}
-          onChange={setSelectedProducts}
-        />
-      </div>
-      <div>
-        <Label htmlFor="conditions">Condiciones</Label>
-        <Input
-          id="conditions"
-          value={conditions}
-          onChange={(e) => setConditions(e.target.value)}
-        />
-      </div>
-      <div>
-        <Label>Duración</Label>
-        <DateRangePicker date={dateRange} onDateChange={setDateRange} />
-      </div>
-      <div className="flex justify-end gap-2">
-        <Button type="button" variant="ghost" onClick={onCancel}>
-          Cancelar
-        </Button>
-        <Button type="submit">Guardar</Button>
-      </div>
-    </form>
+      </form>
+    </Form>
   )
 }
 
