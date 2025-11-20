@@ -1,6 +1,10 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { Helmet } from 'react-helmet-async'
+import { z } from 'zod'
 
+import { ImageUploader } from '@/components/image-uploader'
 import { Pagination } from '@/components/pagination'
 import {
   AlertDialog,
@@ -22,6 +26,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
@@ -41,8 +53,8 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
+// Mock data (manteniendo la estructura existente)
 const initialCategories = ['Pizzas', 'Bebidas', 'Postres']
-
 const initialAddons = [
   {
     id: 1,
@@ -67,7 +79,6 @@ const initialAddons = [
   },
   { id: 4, name: 'Hielo', price: 2, availability: true, category: 'Bebidas' },
 ]
-
 const productsData = [
   {
     id: 1,
@@ -76,6 +87,7 @@ const productsData = [
     availability: true,
     category: 'Pizzas',
     addons: [1, 2],
+    imageUrl: 'https://via.placeholder.com/150/FFC107/000000?Text=Pizza',
   },
   {
     id: 2,
@@ -84,32 +96,19 @@ const productsData = [
     availability: true,
     category: 'Pizzas',
     addons: [1, 2],
-  },
-  {
-    id: 3,
-    name: 'Pizza Margherita',
-    price: 140,
-    availability: false,
-    category: 'Pizzas',
-    addons: [1],
-  },
-  {
-    id: 4,
-    name: 'Coca-Cola',
-    price: 20,
-    availability: true,
-    category: 'Bebidas',
-    addons: [4],
-  },
-  {
-    id: 5,
-    name: 'Tiramisú',
-    price: 50,
-    availability: true,
-    category: 'Postres',
-    addons: [],
+    imageUrl: 'https://via.placeholder.com/150/FFC107/000000?Text=Pizza',
   },
 ]
+
+const productFormSchema = z.object({
+  name: z.string().min(3, 'El nombre debe tener al menos 3 caracteres.'),
+  price: z.coerce.number().min(0, 'El precio debe ser un número positivo.'),
+  category: z.string(),
+  addons: z.array(z.number()).optional(),
+  image: z.instanceof(File).optional(),
+})
+
+type ProductFormValues = z.infer<typeof productFormSchema>
 
 export function Products() {
   const [products, setProducts] = useState(productsData)
@@ -144,15 +143,32 @@ export function Products() {
     page * productsPerPage,
   )
 
-  function handleCreateProduct(newProduct: any) {
-    setProducts([...products, { ...newProduct, id: products.length + 1 }])
-    setIsDialogOpen(false)
-  }
-
-  function handleUpdateProduct(updatedProduct: any) {
-    setProducts(
-      products.map((p) => (p.id === updatedProduct.id ? updatedProduct : p)),
-    )
+  function handleProductSubmit(data: any) {
+    if (editingProduct) {
+      // Lógica de actualización
+      const imageUrl = data.image
+        ? URL.createObjectURL(data.image)
+        : editingProduct.imageUrl
+      setProducts(
+        products.map((p) =>
+          p.id === editingProduct.id
+            ? { ...editingProduct, ...data, imageUrl }
+            : p,
+        ),
+      )
+    } else {
+      // Lógica de creación
+      const imageUrl = data.image ? URL.createObjectURL(data.image) : null
+      setProducts([
+        ...products,
+        {
+          ...data,
+          id: products.length + 1,
+          availability: true,
+          imageUrl,
+        },
+      ])
+    }
     setEditingProduct(null)
     setIsDialogOpen(false)
   }
@@ -173,7 +189,13 @@ export function Products() {
           <h1 className="text-3xl font-bold tracking-tight">
             Gestión de Productos
           </h1>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <Dialog
+            open={isDialogOpen}
+            onOpenChange={(open) => {
+              if (!open) setEditingProduct(null)
+              setIsDialogOpen(open)
+            }}
+          >
             <DialogTrigger asChild>
               <Button onClick={() => setEditingProduct(null)}>
                 Crear Producto
@@ -186,10 +208,9 @@ export function Products() {
                 </DialogTitle>
               </DialogHeader>
               <ProductForm
+                key={editingProduct?.id || 'new'}
                 product={editingProduct}
-                onSubmit={
-                  editingProduct ? handleUpdateProduct : handleCreateProduct
-                }
+                onSubmit={handleProductSubmit}
                 onCancel={() => setIsDialogOpen(false)}
                 categories={categories}
                 addons={addons}
@@ -221,6 +242,7 @@ export function Products() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-24">Imagen</TableHead>
                 <TableHead>Nombre</TableHead>
                 <TableHead>Precio</TableHead>
                 <TableHead>Categoría</TableHead>
@@ -231,6 +253,15 @@ export function Products() {
             <TableBody>
               {paginatedProducts.map((product) => (
                 <TableRow key={product.id}>
+                  <TableCell>
+                    {product.imageUrl && (
+                      <img
+                        src={product.imageUrl}
+                        alt={product.name}
+                        className="h-16 w-16 rounded-md object-cover"
+                      />
+                    )}
+                  </TableCell>
                   <TableCell>{product.name}</TableCell>
                   <TableCell>${product.price}</TableCell>
                   <TableCell>{product.category}</TableCell>
@@ -296,95 +327,151 @@ export function Products() {
 }
 
 function ProductForm({ product, onSubmit, onCancel, categories, addons }) {
-  const [name, setName] = useState(product?.name || '')
-  const [price, setPrice] = useState(product?.price || '')
-  const [category, setCategory] = useState(product?.category || categories[0])
-  const [selectedAddons, setSelectedAddons] = useState<number[]>(
-    product?.addons || [],
-  )
+  const form = useForm<ProductFormValues>({
+    resolver: zodResolver(productFormSchema),
+    defaultValues: {
+      name: product?.name || '',
+      price: product?.price || 0,
+      category: product?.category || categories[0],
+      addons: product?.addons || [],
+    },
+  })
 
-  const availableAddons = addons.filter((a) => a.category === category)
+  const selectedCategory = form.watch('category')
+  const availableAddons = addons.filter((a) => a.category === selectedCategory)
 
-  function handleAddonToggle(addonId: number) {
-    setSelectedAddons((prev) =>
-      prev.includes(addonId)
-        ? prev.filter((id) => id !== addonId)
-        : [...prev, addonId],
-    )
-  }
-
-  function handleSubmit(e) {
-    e.preventDefault()
-    onSubmit({
-      id: product?.id,
-      name,
-      price: parseInt(price),
-      category,
-      availability: product?.availability || false,
-      addons: selectedAddons,
-    })
+  function handleFormSubmit(data: ProductFormValues) {
+    onSubmit(data)
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <Label htmlFor="name">Nombre</Label>
-        <Input
-          id="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(handleFormSubmit)}
+        className="space-y-4"
+      >
+        <FormField
+          control={form.control}
+          name="image"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <ImageUploader
+                  onFileSelected={(file) => field.onChange(file)}
+                  initialImageUrl={product?.imageUrl}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
-      <div>
-        <Label htmlFor="price">Precio</Label>
-        <Input
-          id="price"
-          type="number"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
+
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Nombre</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
-      <div>
-        <Label htmlFor="category">Categoría</Label>
-        <Select value={category} onValueChange={setCategory}>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {categories.map((c) => (
-              <SelectItem key={c} value={c}>
-                {c}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-      <div>
-        <Label>Complementos</Label>
-        <div className="space-y-2">
-          {availableAddons.map((addon) => (
-            <div key={addon.id} className="flex items-center space-x-2">
-              <Checkbox
-                id={`addon-${addon.id}`}
-                checked={selectedAddons.includes(addon.id)}
-                onCheckedChange={() => handleAddonToggle(addon.id)}
-              />
-              <label
-                htmlFor={`addon-${addon.id}`}
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                {addon.name} (+${addon.price})
-              </label>
-            </div>
-          ))}
+
+        <FormField
+          control={form.control}
+          name="price"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Precio</FormLabel>
+              <FormControl>
+                <Input type="number" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="category"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Categoría</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {categories.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {c}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="addons"
+          render={() => (
+            <FormItem>
+              <FormLabel>Complementos</FormLabel>
+              <div className="space-y-2">
+                {availableAddons.map((addon) => (
+                  <FormField
+                    key={addon.id}
+                    control={form.control}
+                    name="addons"
+                    render={({ field }) => {
+                      return (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value?.includes(addon.id)}
+                              onCheckedChange={(checked) => {
+                                return checked
+                                  ? field.onChange([
+                                      ...(field.value || []),
+                                      addon.id,
+                                    ])
+                                  : field.onChange(
+                                      field.value?.filter(
+                                        (value) => value !== addon.id,
+                                      ),
+                                    )
+                              }}
+                            />
+                          </FormControl>
+                          <FormLabel className="font-normal">
+                            {addon.name} (+${addon.price})
+                          </FormLabel>
+                        </FormItem>
+                      )
+                    }}
+                  />
+                ))}
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <div className="flex justify-end gap-2">
+          <Button type="button" variant="ghost" onClick={onCancel}>
+            Cancelar
+          </Button>
+          <Button type="submit">Guardar</Button>
         </div>
-      </div>
-      <div className="flex justify-end gap-2">
-        <Button type="button" variant="ghost" onClick={onCancel}>
-          Cancelar
-        </Button>
-        <Button type="submit">Guardar</Button>
-      </div>
-    </form>
+      </form>
+    </Form>
   )
 }

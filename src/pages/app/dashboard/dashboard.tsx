@@ -6,12 +6,13 @@ import { DeliveryPersonInfo } from '@/pages/app/live-orders/delivery-person-info
 import { OrderDetails } from '@/pages/app/orders/order-details'
 import { Button } from '@/components/ui/button'
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import {
   useAssignDeliveryManMutation,
@@ -31,7 +32,6 @@ export function Dashboard() {
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null)
   const [selectedDeliveryPerson, setSelectedDeliveryPerson] =
     useState<DeliveryPerson | null>(null)
-  const [isAssignDriverModalOpen, setIsAssignDriverModalOpen] = useState(false)
   const [driverSearchTerm, setDriverSearchTerm] = useState('')
 
   const { data: orders } = useGetOrdersQuery({
@@ -76,7 +76,6 @@ export function Dashboard() {
       orderId: selectedOrderId,
       deliveryManId: driver.id,
     })
-    setIsAssignDriverModalOpen(false)
   }
 
   function handleSimulateNewOrder() {
@@ -126,41 +125,50 @@ export function Dashboard() {
                 <OrderDetails orderId={selectedOrder.orderId} />
 
                 <div className="mt-4 space-y-3">
-                  <Dialog
-                    open={isAssignDriverModalOpen}
-                    onOpenChange={setIsAssignDriverModalOpen}
-                  >
-                    <DialogTrigger asChild>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
                       <Button className="w-full">
                         {assignedDriver
                           ? 'Cambiar repartidor'
                           : 'Asignar repartidor'}
                       </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Seleccionar repartidor</DialogTitle>
-                      </DialogHeader>
-                      <Input
-                        placeholder="Buscar repartidor..."
-                        value={driverSearchTerm}
-                        onChange={(e) => setDriverSearchTerm(e.target.value)}
-                        className="mb-4"
-                      />
-                      <div className="space-y-2">
-                        {filteredDrivers?.map((driver) => (
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      className="w-[300px] max-h-72 overflow-y-auto"
+                      side="bottom"
+                      sideOffset={5}
+                    >
+                      <DropdownMenuLabel>
+                        Seleccionar repartidor
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <div className="p-2">
+                        <Input
+                          placeholder="Buscar repartidor..."
+                          value={driverSearchTerm}
+                          onChange={(e) =>
+                            setDriverSearchTerm(e.target.value)
+                          }
+                          className="mb-2"
+                        />
+                      </div>
+                      {filteredDrivers?.map((driver) => (
+                        <DropdownMenuItem
+                          key={driver.id}
+                          asChild
+                          onSelect={() => handleAssignDriver(driver)}
+                        >
                           <Button
-                            key={driver.id}
                             variant="ghost"
                             className="w-full justify-start"
-                            onClick={() => handleAssignDriver(driver)}
                           >
                             {driver.name}
                           </Button>
-                        ))}
-                      </div>
-                    </DialogContent>
-                  </Dialog>
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
                   {assignedDriver && (
                     <p className="text-sm font-medium flex items-center gap-2">
                       <span className="text-lg">🚚</span> Repartidor asignado:{' '}
