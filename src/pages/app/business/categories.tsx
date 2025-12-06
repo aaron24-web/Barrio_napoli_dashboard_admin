@@ -1,8 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Helmet } from 'react-helmet-async'
 import { z } from 'zod'
+import { toast } from 'sonner'
 
 import { ImageUploader } from '@/components/image-uploader'
 import {
@@ -41,24 +42,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-
-const initialCategories = [
-  {
-    id: 1,
-    name: 'Pizzas',
-    imageUrl: 'https://via.placeholder.com/150/0000FF/FFFFFF?Text=Pizzas',
-  },
-  {
-    id: 2,
-    name: 'Bebidas',
-    imageUrl: 'https://via.placeholder.com/150/FF0000/FFFFFF?Text=Bebidas',
-  },
-  {
-    id: 3,
-    name: 'Postres',
-    imageUrl: 'https://via.placeholder.com/150/00FF00/FFFFFF?Text=Postres',
-  },
-]
+import { Skeleton } from '@/components/ui/skeleton'
+import { useCategories, useCreateCategory, useUpdateCategory, useDeleteCategory } from '@/core/hooks/useCategories'
+import { Category } from '@/core/models/category.model'
 
 const categoryFormSchema = z.object({
   name: z.string().min(3, 'El nombre debe tener al menos 3 caracteres.'),
@@ -68,42 +54,40 @@ const categoryFormSchema = z.object({
 type CategoryFormValues = z.infer<typeof categoryFormSchema>
 
 export function Categories() {
-  const [categories, setCategories] = useState(() => {
-    const storedCategories = localStorage.getItem('categories')
-    return storedCategories ? JSON.parse(storedCategories) : initialCategories
-  })
+  const { data: categories, isLoading, isError } = useCategories()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [editingCategory, setEditingCategory] = useState<any | null>(null)
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null)
 
-  useEffect(() => {
-    localStorage.setItem('categories', JSON.stringify(categories))
-  }, [categories])
+  const createCategoryMutation = useCreateCategory()
+  const updateCategoryMutation = useUpdateCategory()
+  const deleteCategoryMutation = useDeleteCategory()
 
-  function handleCategorySubmit(data: any) {
-    if (editingCategory) {
-      const imageUrl = data.image
-        ? URL.createObjectURL(data.image)
-        : editingCategory.imageUrl
-      setCategories(
-        categories.map((c) =>
-          c.id === editingCategory.id
-            ? { ...editingCategory, ...data, imageUrl }
-            : c,
-        ),
-      )
-    } else {
-      const imageUrl = data.image ? URL.createObjectURL(data.image) : null
-      setCategories([
-        ...categories,
-        { ...data, id: categories.length + 1, imageUrl },
-      ])
+  async function handleCategorySubmit(data: CategoryFormValues) {
+    try {
+      if (editingCategory) {
+        await updateCategoryMutation.mutateAsync({
+          id: editingCategory.id,
+          ...data,
+        })
+        toast.success('Categoría actualizada con éxito.')
+      } else {
+        await createCategoryMutation.mutateAsync(data)
+        toast.success('Categoría creada con éxito.')
+      }
+      setEditingCategory(null)
+      setIsDialogOpen(false)
+    } catch (error) {
+      toast.error('Error al guardar la categoría.')
     }
-    setEditingCategory(null)
-    setIsDialogOpen(false)
   }
 
-  function handleDeleteCategory(id: number) {
-    setCategories(categories.filter((c) => c.id !== id))
+  async function handleDeleteCategory(id: string) {
+    try {
+      await deleteCategoryMutation.mutateAsync(id)
+      toast.success('Categoría eliminada con éxito.')
+    } catch (error) {
+      toast.error('Error al eliminar la categoría.')
+    }
   }
 
   return (
@@ -137,6 +121,7 @@ export function Categories() {
                 category={editingCategory}
                 onSubmit={handleCategorySubmit}
                 onCancel={() => setIsDialogOpen(false)}
+                isSubmitting={createCategoryMutation.isPending || updateCategoryMutation.isPending}
               />
             </DialogContent>
           </Dialog>
@@ -151,7 +136,25 @@ export function Categories() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {categories.map((category) => (
+              {isLoading && (
+                <>
+                  {[...Array(5)].map((_, i) => (
+                    <TableRow key={i}>
+                      <TableCell><Skeleton className="h-16 w-16 rounded-md" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-48" /></TableCell>
+                      <TableCell><Skeleton className="h-8 w-24" /></TableCell>
+                    </TableRow>
+                  ))}
+                </>
+              )}
+              {isError && (
+                <TableRow>
+                  <TableCell colSpan={3} className="text-center text-red-500">
+                    Error al cargar las categorías.
+                  </TableCell>
+                </TableRow>
+              )}
+              {categories?.map((category) => (
                 <TableRow key={category.id}>
                   <TableCell>
                     {category.imageUrl && (
@@ -210,7 +213,7 @@ export function Categories() {
   )
 }
 
-function CategoryForm({ category, onSubmit, onCancel }) {
+function CategoryForm({ category, onSubmit, onCancel, isSubmitting }) {
   const form = useForm<CategoryFormValues>({
     resolver: zodResolver(categoryFormSchema),
     defaultValues: {
@@ -251,7 +254,7 @@ function CategoryForm({ category, onSubmit, onCancel }) {
             <FormItem>
               <FormLabel>Nombre</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input {...field} disabled={isSubmitting} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -259,10 +262,12 @@ function CategoryForm({ category, onSubmit, onCancel }) {
         />
 
         <div className="flex justify-end gap-2">
-          <Button type="button" variant="ghost" onClick={onCancel}>
+          <Button type="button" variant="ghost" onClick={onCancel} disabled={isSubmitting}>
             Cancelar
           </Button>
-          <Button type="submit">Guardar</Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? 'Guardando...' : 'Guardar'}
+          </Button>
         </div>
       </form>
     </Form>

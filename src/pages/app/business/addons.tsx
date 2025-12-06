@@ -1,8 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Helmet } from 'react-helmet-async'
 import { z } from 'zod'
+import { toast } from 'sonner'
 
 import { ImageUploader } from '@/components/image-uploader'
 import { Pagination } from '@/components/pagination'
@@ -50,102 +51,85 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-
-const initialAddons = [
-  {
-    id: 1,
-    name: 'Queso Extra',
-    price: 10,
-    availability: true,
-    category: 'Pizzas',
-    imageUrl: 'https://via.placeholder.com/150/FBC02D/000000?Text=Queso',
-  },
-  {
-    id: 2,
-    name: 'Peperoni',
-    price: 15,
-    availability: true,
-    category: 'Pizzas',
-    imageUrl: 'https://via.placeholder.com/150/D32F2F/FFFFFF?Text=Peperoni',
-  },
-]
-
-const initialCategories = ['Pizzas', 'Bebidas', 'Postres']
+import { Skeleton } from '@/components/ui/skeleton'
+import { useAddons, useCreateAddon, useUpdateAddon, useDeleteAddon } from '@/core/hooks/useAddons'
+import { useCategories } from '@/core/hooks/useCategories'
+import { Addon } from '@/core/models/addon.model'
+import { MultiSelect } from '@/components/ui/multi-select'
 
 const addonFormSchema = z.object({
   name: z.string().min(3, 'El nombre debe tener al menos 3 caracteres.'),
-  price: z.coerce.number().min(0, 'El precio debe ser un número positivo.'),
-  category: z.string(),
+  priceInCents: z.coerce.number().min(0, 'El precio debe ser un número positivo.'),
+  categoryIds: z.array(z.string()).min(1, 'Selecciona al menos una categoría.'),
   image: z.instanceof(File).optional(),
 })
 
 type AddonFormValues = z.infer<typeof addonFormSchema>
 
 export function Addons() {
-  const [addons, setAddons] = useState(() => {
-    const storedAddons = localStorage.getItem('addons')
-    return storedAddons ? JSON.parse(storedAddons) : initialAddons
-  })
-  const [categories, setCategories] = useState(() => {
-    const storedCategories = localStorage.getItem('categories')
-    return storedCategories
-      ? JSON.parse(storedCategories).map((c) => c.name)
-      : initialCategories
-  })
+  const { data: addons, isLoading, isError } = useAddons()
+  const { data: categories } = useCategories()
+  
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [editingAddon, setEditingAddon] = useState<any | null>(null)
+  const [editingAddon, setEditingAddon] = useState<Addon | null>(null)
   const [search, setSearch] = useState('')
   const [availabilityFilter, setAvailabilityFilter] = useState('all')
   const [page, setPage] = useState(1)
   const addonsPerPage = 10
 
-  useEffect(() => {
-    localStorage.setItem('addons', JSON.stringify(addons))
-  }, [addons])
+  const createAddonMutation = useCreateAddon()
+  const updateAddonMutation = useUpdateAddon()
+  const deleteAddonMutation = useDeleteAddon()
 
   const filteredAddons = addons
-    .filter((a) => a.name.toLowerCase().includes(search.toLowerCase()))
+    ?.filter((a) => a.name.toLowerCase().includes(search.toLowerCase()))
     .filter(
       (a) =>
         availabilityFilter === 'all' ||
-        (availabilityFilter === 'available' && a.availability) ||
-        (availabilityFilter === 'unavailable' && !a.availability),
+        (availabilityFilter === 'available' && a.isAvailable) ||
+        (availabilityFilter === 'unavailable' && !a.isAvailable),
     )
 
-  const paginatedAddons = filteredAddons.slice(
+  const paginatedAddons = filteredAddons?.slice(
     (page - 1) * addonsPerPage,
     page * addonsPerPage,
   )
 
-  function handleAddonSubmit(data: any) {
-    if (editingAddon) {
-      const imageUrl = data.image
-        ? URL.createObjectURL(data.image)
-        : editingAddon.imageUrl
-      setAddons(
-        addons.map((a) =>
-          a.id === editingAddon.id
-            ? { ...editingAddon, ...data, imageUrl }
-            : a,
-        ),
-      )
-    } else {
-      const imageUrl = data.image ? URL.createObjectURL(data.image) : null
-      setAddons([
-        ...addons,
-        { ...data, id: addons.length + 1, availability: true, imageUrl },
-      ])
+  async function handleAddonSubmit(data: AddonFormValues) {
+    try {
+      if (editingAddon) {
+        await updateAddonMutation.mutateAsync({
+          id: editingAddon.id,
+          ...data,
+        })
+        toast.success('Complemento actualizado con éxito.')
+      } else {
+        await createAddonMutation.mutateAsync(data)
+        toast.success('Complemento creado con éxito.')
+      }
+      setEditingAddon(null)
+      setIsDialogOpen(false)
+    } catch (error) {
+      toast.error('Error al guardar el complemento.')
     }
-    setEditingAddon(null)
-    setIsDialogOpen(false)
   }
 
-  function handleDeleteAddon(id: number) {
-    setAddons(addons.filter((a) => a.id !== id))
+  async function handleDeleteAddon(id: string) {
+    try {
+      await deleteAddonMutation.mutateAsync(id)
+      toast.success('Complemento eliminado con éxito.')
+    } catch (error) {
+      toast.error('Error al eliminar el complemento.')
+    }
   }
 
-  function handleAvailabilityChange(id: number, availability: boolean) {
-    setAddons(addons.map((a) => (a.id === id ? { ...a, availability } : a)))
+  async function handleAvailabilityChange(id: string, isAvailable: boolean) {
+    try {
+      await updateAddonMutation.mutateAsync({ id, isAvailable })
+      toast.success('Disponibilidad actualizada.')
+    } catch (error) {
+      toast.error('Error al actualizar la disponibilidad.')
+    }
   }
 
   return (
@@ -179,7 +163,8 @@ export function Addons() {
                 addon={editingAddon}
                 onSubmit={handleAddonSubmit}
                 onCancel={() => setIsDialogOpen(false)}
-                categories={categories}
+                categories={categories || []}
+                isSubmitting={createAddonMutation.isPending || updateAddonMutation.isPending}
               />
             </DialogContent>
           </Dialog>
@@ -211,13 +196,32 @@ export function Addons() {
                 <TableHead className="w-24">Imagen</TableHead>
                 <TableHead>Nombre</TableHead>
                 <TableHead>Precio</TableHead>
-                <TableHead>Categoría</TableHead>
                 <TableHead>Disponibilidad</TableHead>
                 <TableHead>Acciones</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {paginatedAddons.map((addon) => (
+              {isLoading && (
+                <>
+                  {[...Array(5)].map((_, i) => (
+                    <TableRow key={i}>
+                      <TableCell><Skeleton className="h-16 w-16 rounded-md" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                      <TableCell><Skeleton className="h-8 w-20" /></TableCell>
+                      <TableCell><Skeleton className="h-8 w-24" /></TableCell>
+                    </TableRow>
+                  ))}
+                </>
+              )}
+              {isError && (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center text-red-500">
+                    Error al cargar los complementos.
+                  </TableCell>
+                </TableRow>
+              )}
+              {paginatedAddons?.map((addon) => (
                 <TableRow key={addon.id}>
                   <TableCell>
                     {addon.imageUrl && (
@@ -229,11 +233,10 @@ export function Addons() {
                     )}
                   </TableCell>
                   <TableCell>{addon.name}</TableCell>
-                  <TableCell>${addon.price}</TableCell>
-                  <TableCell>{addon.category}</TableCell>
+                  <TableCell>${(addon.priceInCents / 100).toFixed(2)}</TableCell>
                   <TableCell>
                     <Switch
-                      checked={addon.availability}
+                      checked={addon.isAvailable}
                       onCheckedChange={(checked) =>
                         handleAvailabilityChange(addon.id, checked)
                       }
@@ -281,30 +284,34 @@ export function Addons() {
             </TableBody>
           </Table>
         </div>
-        <Pagination
-          pageIndex={page - 1}
-          totalCount={filteredAddons.length}
-          perPage={addonsPerPage}
-          onPageChange={(page) => setPage(page + 1)}
-        />
+        {filteredAddons && (
+          <Pagination
+            pageIndex={page - 1}
+            totalCount={filteredAddons.length}
+            perPage={addonsPerPage}
+            onPageChange={(page) => setPage(page + 1)}
+          />
+        )}
       </div>
     </>
   )
 }
 
-function AddonForm({ addon, onSubmit, onCancel, categories }) {
+function AddonForm({ addon, onSubmit, onCancel, categories, isSubmitting }) {
   const form = useForm<AddonFormValues>({
     resolver: zodResolver(addonFormSchema),
     defaultValues: {
       name: addon?.name || '',
-      price: addon?.price || 0,
-      category: addon?.category || categories[0],
+      priceInCents: addon?.priceInCents || 0,
+      categoryIds: addon?.categories?.map(c => c.id) || [],
     },
   })
 
   function handleFormSubmit(data: AddonFormValues) {
     onSubmit(data)
   }
+
+  const categoryOptions = categories.map(c => ({ value: c.id, label: c.name }))
 
   return (
     <Form {...form}>
@@ -335,7 +342,7 @@ function AddonForm({ addon, onSubmit, onCancel, categories }) {
             <FormItem>
               <FormLabel>Nombre</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input {...field} disabled={isSubmitting} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -344,12 +351,12 @@ function AddonForm({ addon, onSubmit, onCancel, categories }) {
 
         <FormField
           control={form.control}
-          name="price"
+          name="priceInCents"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Precio</FormLabel>
+              <FormLabel>Precio (en centavos)</FormLabel>
               <FormControl>
-                <Input type="number" {...field} />
+                <Input type="number" {...field} disabled={isSubmitting} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -358,34 +365,28 @@ function AddonForm({ addon, onSubmit, onCancel, categories }) {
 
         <FormField
           control={form.control}
-          name="category"
+          name="categoryIds"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Categoría a la que pertenece</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {categories.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      {c}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <FormLabel>Categorías</FormLabel>
+              <MultiSelect
+                options={categoryOptions}
+                value={field.value}
+                onChange={field.onChange}
+                placeholder="Selecciona categorías..."
+              />
               <FormMessage />
             </FormItem>
           )}
         />
 
         <div className="flex justify-end gap-2">
-          <Button type="button" variant="ghost" onClick={onCancel}>
+          <Button type="button" variant="ghost" onClick={onCancel} disabled={isSubmitting}>
             Cancelar
           </Button>
-          <Button type="submit">Guardar</Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? 'Guardando...' : 'Guardar'}
+          </Button>
         </div>
       </form>
     </Form>

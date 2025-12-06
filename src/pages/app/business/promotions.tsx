@@ -41,60 +41,8 @@ import {
 
 import { PromotionForm } from './promotion-form'
 
-const promotionsData = [
-  {
-    id: 1,
-    name: 'Pizza 2x1',
-    description: 'Compra una pizza y llévate la segunda gratis',
-    type: 'Oferta Especial',
-    conditions: 'Aplica solo en pizzas seleccionadas',
-    startDate: new Date(2024, 10, 1),
-    endDate: new Date(2024, 10, 15),
-    availability: true,
-    products: [1, 2],
-    imageUrl: 'https://via.placeholder.com/150/4CAF50/FFFFFF?Text=2x1',
-  },
-  {
-    id: 2,
-    name: 'Combo Amigos',
-    description: '2 pizzas grandes + 1 refresco de 2L',
-    type: 'Combo',
-    conditions: 'No aplica con otras promociones',
-    startDate: new Date(2024, 10, 1),
-    endDate: new Date(2024, 10, 31),
-    availability: true,
-    products: [1, 2, 4],
-    imageUrl: 'https://via.placeholder.com/150/2196F3/FFFFFF?Text=Combo',
-  },
-  {
-    id: 3,
-    name: '10% Descuento Bienvenida',
-    description: '10% de descuento en tu primera compra',
-    type: 'Cupón',
-    code: 'BIENVENIDO10',
-    conditions: 'Válido solo en la primera compra',
-    startDate: new Date(2024, 0, 1),
-    endDate: new Date(2024, 11, 31),
-    availability: true,
-    products: [],
-    imageUrl: 'https://via.placeholder.com/150/FF9800/FFFFFF?Text=Cupón',
-  },
-]
-
-const initialProducts = [
-  {
-    id: 1,
-    name: 'Pizza Napolitana',
-  },
-  {
-    id: 2,
-    name: 'Pizza Diavola',
-  },
-  {
-    id: 4,
-    name: 'Coca-Cola',
-  },
-]
+const promotionsData = []
+const initialProducts = []
 
 export function Promotions() {
   const [promotions, setPromotions] = useState(promotionsData)

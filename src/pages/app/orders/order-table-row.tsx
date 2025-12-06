@@ -93,6 +93,18 @@ export function OrderTableRow({ order }: OrderTableRowProps) {
             size="xs"
           >
             <ArrowRight className="mr-2 h-3 w-3" />
+            En preparación
+          </Button>
+        )}
+
+        {order.status === 'processing' && (
+          <Button
+            onClick={() => dispatchOrderFn(order.orderId)}
+            disabled={isDispatchingOrder}
+            variant="outline"
+            size="xs"
+          >
+            <ArrowRight className="mr-2 h-3 w-3" />
             En reparto
           </Button>
         )}

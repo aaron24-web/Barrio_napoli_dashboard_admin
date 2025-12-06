@@ -54,51 +54,9 @@ import {
 } from '@/components/ui/table'
 
 // Mock data (manteniendo la estructura existente)
-const initialCategories = ['Pizzas', 'Bebidas', 'Postres']
-const initialAddons = [
-  {
-    id: 1,
-    name: 'Queso Extra',
-    price: 10,
-    availability: true,
-    category: 'Pizzas',
-  },
-  {
-    id: 2,
-    name: 'Peperoni',
-    price: 15,
-    availability: true,
-    category: 'Pizzas',
-  },
-  {
-    id: 3,
-    name: 'Masa Delgada',
-    price: 0,
-    availability: false,
-    category: 'Pizzas',
-  },
-  { id: 4, name: 'Hielo', price: 2, availability: true, category: 'Bebidas' },
-]
-const productsData = [
-  {
-    id: 1,
-    name: 'Pizza Napolitana',
-    price: 150,
-    availability: true,
-    category: 'Pizzas',
-    addons: [1, 2],
-    imageUrl: 'https://via.placeholder.com/150/FFC107/000000?Text=Pizza',
-  },
-  {
-    id: 2,
-    name: 'Pizza Diavola',
-    price: 160,
-    availability: true,
-    category: 'Pizzas',
-    addons: [1, 2],
-    imageUrl: 'https://via.placeholder.com/150/FFC107/000000?Text=Pizza',
-  },
-]
+const initialCategories = []
+const initialAddons = []
+const productsData = []
 
 const productFormSchema = z.object({
   name: z.string().min(3, 'El nombre debe tener al menos 3 caracteres.'),
