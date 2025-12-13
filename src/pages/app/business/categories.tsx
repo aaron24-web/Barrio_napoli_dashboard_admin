@@ -2,10 +2,17 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Helmet } from 'react-helmet-async'
-import { z } from 'zod'
 import { toast } from 'sonner'
+import { z } from 'zod'
 
-import { ImageUploader } from '@/components/image-uploader'
+import {
+  useCategories,
+  useCreateCategory,
+  useDeleteCategory,
+  useUpdateCategory,
+} from '@/entities/category/model/useCategories'
+import { type Category } from '@/entities/category/model/category.model'
+import { ImageUploader } from '@/features/image-uploader/ui/image-uploader'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,15 +23,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog'
-import { Button } from '@/components/ui/button'
+} from '@/shared/ui/alert-dialog'
+import { Button } from '@/shared/ui/button'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog'
+} from '@/shared/ui/dialog'
 import {
   Form,
   FormControl,
@@ -32,8 +39,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
+} from '@/shared/ui/form'
+import { Input } from '@/shared/ui/input'
+import { Skeleton } from '@/shared/ui/skeleton'
 import {
   Table,
   TableBody,
@@ -41,10 +49,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { Skeleton } from '@/components/ui/skeleton'
-import { useCategories, useCreateCategory, useUpdateCategory, useDeleteCategory } from '@/core/hooks/useCategories'
-import { Category } from '@/core/models/category.model'
+} from '@/shared/ui/table'
 
 const categoryFormSchema = z.object({
   name: z.string().min(3, 'El nombre debe tener al menos 3 caracteres.'),
@@ -121,7 +126,10 @@ export function Categories() {
                 category={editingCategory}
                 onSubmit={handleCategorySubmit}
                 onCancel={() => setIsDialogOpen(false)}
-                isSubmitting={createCategoryMutation.isPending || updateCategoryMutation.isPending}
+                isSubmitting={
+                  createCategoryMutation.isPending ||
+                  updateCategoryMutation.isPending
+                }
               />
             </DialogContent>
           </Dialog>
@@ -140,16 +148,25 @@ export function Categories() {
                 <>
                   {[...Array(5)].map((_, i) => (
                     <TableRow key={i}>
-                      <TableCell><Skeleton className="h-16 w-16 rounded-md" /></TableCell>
-                      <TableCell><Skeleton className="h-4 w-48" /></TableCell>
-                      <TableCell><Skeleton className="h-8 w-24" /></TableCell>
+                      <TableCell>
+                        <Skeleton className="h-16 w-16 rounded-md" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-4 w-48" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-8 w-24" />
+                      </TableCell>
                     </TableRow>
                   ))}
                 </>
               )}
               {isError && (
                 <TableRow>
-                  <TableCell colSpan={3} className="text-center text-red-500">
+                  <TableCell
+                    colSpan={3}
+                    className="text-center text-red-500"
+                  >
                     Error al cargar las categorías.
                   </TableCell>
                 </TableRow>
@@ -262,7 +279,12 @@ function CategoryForm({ category, onSubmit, onCancel, isSubmitting }) {
         />
 
         <div className="flex justify-end gap-2">
-          <Button type="button" variant="ghost" onClick={onCancel} disabled={isSubmitting}>
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={onCancel}
+            disabled={isSubmitting}
+          >
             Cancelar
           </Button>
           <Button type="submit" disabled={isSubmitting}>

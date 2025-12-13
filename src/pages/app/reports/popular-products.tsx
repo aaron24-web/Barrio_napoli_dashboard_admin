@@ -1,6 +1,6 @@
 import { subDays } from 'date-fns'
 import { useState } from 'react'
-import { DateRange } from 'react-day-picker'
+import { type DateRange } from 'react-day-picker'
 import {
   Bar,
   BarChart,
@@ -11,9 +11,9 @@ import {
   YAxis,
 } from 'recharts'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { DateRangePicker } from '@/components/ui/date-range-picker'
-import { useGetPopularProductsQuery } from '@/core/hooks/useMetrics'
+import { useGetPopularProductsQuery } from '@/entities/metrics/model/useMetrics'
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
+import { DateRangePicker } from '@/shared/ui/date-range-picker'
 
 export function PopularProducts() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>({

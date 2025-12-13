@@ -3,8 +3,8 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-import { ImageUploader } from '@/components/image-uploader'
-import { Button } from '@/components/ui/button'
+import { ImageUploader } from '@/features/image-uploader/ui/image-uploader'
+import { Button } from '@/shared/ui/button'
 import {
   Form,
   FormControl,
@@ -12,8 +12,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
+} from '@/shared/ui/form'
+import { Input } from '@/shared/ui/input'
 import {
   CreateDeliveryManPayload,
   DeliveryMan,

@@ -2,11 +2,18 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Helmet } from 'react-helmet-async'
-import { z } from 'zod'
 import { toast } from 'sonner'
+import { z } from 'zod'
 
-import { ImageUploader } from '@/components/image-uploader'
-import { Pagination } from '@/components/pagination'
+import {
+  useAddons,
+  useCreateAddon,
+  useDeleteAddon,
+  useUpdateAddon,
+} from '@/entities/addon/model/useAddons'
+import { type Addon } from '@/entities/addon/model/addon.model'
+import { useCategories } from '@/entities/category/model/useCategories'
+import { ImageUploader } from '@/features/image-uploader/ui/image-uploader'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,15 +24,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog'
-import { Button } from '@/components/ui/button'
+} from '@/shared/ui/alert-dialog'
+import { Button } from '@/shared/ui/button'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog'
+} from '@/shared/ui/dialog'
 import {
   Form,
   FormControl,
@@ -33,16 +40,19 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
+} from '@/shared/ui/form'
+import { Input } from '@/shared/ui/input'
+import { MultiSelect } from '@/shared/ui/multi-select'
+import { Pagination } from '@/shared/ui/pagination'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Switch } from '@/components/ui/switch'
+} from '@/shared/ui/select'
+import { Skeleton } from '@/shared/ui/skeleton'
+import { Switch } from '@/shared/ui/switch'
 import {
   Table,
   TableBody,
@@ -50,12 +60,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { Skeleton } from '@/components/ui/skeleton'
-import { useAddons, useCreateAddon, useUpdateAddon, useDeleteAddon } from '@/core/hooks/useAddons'
-import { useCategories } from '@/core/hooks/useCategories'
-import { Addon } from '@/core/models/addon.model'
-import { MultiSelect } from '@/components/ui/multi-select'
+} from '@/shared/ui/table'
 
 const addonFormSchema = z.object({
   name: z.string().min(3, 'El nombre debe tener al menos 3 caracteres.'),
@@ -69,7 +74,7 @@ type AddonFormValues = z.infer<typeof addonFormSchema>
 export function Addons() {
   const { data: addons, isLoading, isError } = useAddons()
   const { data: categories } = useCategories()
-  
+
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingAddon, setEditingAddon] = useState<Addon | null>(null)
   const [search, setSearch] = useState('')
@@ -164,7 +169,10 @@ export function Addons() {
                 onSubmit={handleAddonSubmit}
                 onCancel={() => setIsDialogOpen(false)}
                 categories={categories || []}
-                isSubmitting={createAddonMutation.isPending || updateAddonMutation.isPending}
+                isSubmitting={
+                  createAddonMutation.isPending ||
+                  updateAddonMutation.isPending
+                }
               />
             </DialogContent>
           </Dialog>
@@ -205,11 +213,21 @@ export function Addons() {
                 <>
                   {[...Array(5)].map((_, i) => (
                     <TableRow key={i}>
-                      <TableCell><Skeleton className="h-16 w-16 rounded-md" /></TableCell>
-                      <TableCell><Skeleton className="h-4 w-32" /></TableCell>
-                      <TableCell><Skeleton className="h-4 w-24" /></TableCell>
-                      <TableCell><Skeleton className="h-8 w-20" /></TableCell>
-                      <TableCell><Skeleton className="h-8 w-24" /></TableCell>
+                      <TableCell>
+                        <Skeleton className="h-16 w-16 rounded-md" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-4 w-32" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-4 w-24" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-8 w-20" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-8 w-24" />
+                      </TableCell>
                     </TableRow>
                   ))}
                 </>
@@ -233,7 +251,9 @@ export function Addons() {
                     )}
                   </TableCell>
                   <TableCell>{addon.name}</TableCell>
-                  <TableCell>${(addon.priceInCents / 100).toFixed(2)}</TableCell>
+                  <TableCell>
+                    ${(addon.priceInCents / 100).toFixed(2)}
+                  </TableCell>
                   <TableCell>
                     <Switch
                       checked={addon.isAvailable}
@@ -303,7 +323,7 @@ function AddonForm({ addon, onSubmit, onCancel, categories, isSubmitting }) {
     defaultValues: {
       name: addon?.name || '',
       priceInCents: addon?.priceInCents || 0,
-      categoryIds: addon?.categories?.map(c => c.id) || [],
+      categoryIds: addon?.categories?.map((c) => c.id) || [],
     },
   })
 
@@ -311,7 +331,10 @@ function AddonForm({ addon, onSubmit, onCancel, categories, isSubmitting }) {
     onSubmit(data)
   }
 
-  const categoryOptions = categories.map(c => ({ value: c.id, label: c.name }))
+  const categoryOptions = categories.map((c) => ({
+    value: c.id,
+    label: c.name,
+  }))
 
   return (
     <Form {...form}>
@@ -381,7 +404,12 @@ function AddonForm({ addon, onSubmit, onCancel, categories, isSubmitting }) {
         />
 
         <div className="flex justify-end gap-2">
-          <Button type="button" variant="ghost" onClick={onCancel} disabled={isSubmitting}>
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={onCancel}
+            disabled={isSubmitting}
+          >
             Cancelar
           </Button>
           <Button type="submit" disabled={isSubmitting}>

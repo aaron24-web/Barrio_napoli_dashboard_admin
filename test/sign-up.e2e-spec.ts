@@ -1,39 +1,41 @@
 import { expect, test } from '@playwright/test'
 
-test('sign up successfully', async ({ page }) => {
+test('registrarse exitosamente', async ({ page }) => {
   await page.goto('/sign-up', { waitUntil: 'networkidle' })
 
-  await page.getByLabel('Nome do estabelecimento').fill('Barrio Napoli')
-  await page.getByLabel('Seu nome').fill('John Doe')
-  await page.getByLabel('Seu e-mail').fill('johndoe@example.com')
-  await page.getByLabel('Seu celular').fill('123812641264')
+  await page.getByLabel('Nombre del establecimiento').fill('Barrio Napoli')
+  await page.getByLabel('Tu nombre').fill('John Doe')
+  await page.getByLabel('Tu correo electrónico').fill('johndoe@example.com')
+  await page.getByLabel('Tu teléfono móvil').fill('123812641264')
+  await page.getByLabel('Tu contraseña').fill('123456')
 
-  await page.getByRole('button', { name: 'Finalizar cadastro' }).click()
+  await page.getByRole('button', { name: 'Finalizar registro' }).click()
 
-  const toast = page.getByText('Restaurante cadastrado com sucesso')
+  const toast = page.getByText('Restaurante registrado con éxito')
 
   expect(toast).toBeVisible()
 })
 
-test('sign up with error', async ({ page }) => {
+test('registrarse con error', async ({ page }) => {
   await page.goto('/sign-up', { waitUntil: 'networkidle' })
 
-  await page.getByLabel('Nome do estabelecimento').fill('Invalid name')
-  await page.getByLabel('Seu nome').fill('John Doe')
-  await page.getByLabel('Seu e-mail').fill('johndoe@example.com')
-  await page.getByLabel('Seu celular').fill('123812641264')
+  await page.getByLabel('Nombre del establecimiento').fill('Invalid name')
+  await page.getByLabel('Tu nombre').fill('John Doe')
+  await page.getByLabel('Tu correo electrónico').fill('johndoe@example.com')
+  await page.getByLabel('Tu teléfono móvil').fill('123812641264')
+  await page.getByLabel('Tu contraseña').fill('123456')
 
-  await page.getByRole('button', { name: 'Finalizar cadastro' }).click()
+  await page.getByRole('button', { name: 'Finalizar registro' }).click()
 
-  const toast = page.getByText('Erro ao cadastrar restaurante')
+  const toast = page.getByText('Error al registrar el restaurante')
 
   expect(toast).toBeVisible()
 })
 
-test('navigate to login page', async ({ page }) => {
+test('navegar a la página de inicio de sesión', async ({ page }) => {
   await page.goto('/sign-up', { waitUntil: 'networkidle' })
 
-  await page.getByRole('link', { name: 'Fazer login' }).click()
+  await page.getByRole('link', { name: 'Iniciar sesión' }).click()
 
   expect(page.url()).toContain('/sign-in')
 })

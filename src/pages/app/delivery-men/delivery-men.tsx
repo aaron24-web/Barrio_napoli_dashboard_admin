@@ -1,7 +1,15 @@
 import { Helmet } from 'react-helmet-async'
 import { useState } from 'react'
 
-import { Pagination } from '@/components/pagination'
+import {
+  useCreateDeliveryManMutation,
+  useDeleteDeliveryManMutation,
+  useGetDeliveryMenQuery,
+  useToggleDeliveryManStatusMutation,
+  useUpdateDeliveryManMutation,
+} from '@/entities/delivery/model/useDelivery'
+import { type DeliveryMan } from '@/entities/delivery/model/delivery.model'
+import { Pagination } from '@/shared/ui/pagination'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,24 +20,24 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog'
-import { Button } from '@/components/ui/button'
+} from '@/shared/ui/alert-dialog'
+import { Button } from '@/shared/ui/button'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
+} from '@/shared/ui/dialog'
+import { Input } from '@/shared/ui/input'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Switch } from '@/components/ui/switch'
+} from '@/shared/ui/select'
+import { Switch } from '@/shared/ui/switch'
 import {
   Table,
   TableBody,
@@ -37,15 +45,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import {
-  useCreateDeliveryManMutation,
-  useDeleteDeliveryManMutation,
-  useGetDeliveryMenQuery,
-  useToggleDeliveryManStatusMutation,
-  useUpdateDeliveryManMutation,
-} from '@/core/hooks/useDelivery'
-import { DeliveryMan } from '@/core/models/delivery.model'
+} from '@/shared/ui/table'
 
 import { CreateDeliveryMan } from './create-delivery-man'
 

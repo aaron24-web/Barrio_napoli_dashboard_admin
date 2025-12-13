@@ -2,15 +2,15 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-import { Button } from '@/components/ui/button'
-import { DialogClose, DialogFooter } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { useChangePasswordMutation } from '@/core/hooks/useAuth'
+import { Button } from '@/shared/ui/button'
+import { DialogClose, DialogFooter } from '@/shared/ui/dialog'
+import { Input } from '@/shared/ui/input'
+import { Label } from '@/shared/ui/label'
+import { useChangePasswordMutation } from '@/features/auth/model/useAuth'
 import {
   useGetProfileQuery,
   useUpdateProfileMutation,
-} from '@/core/hooks/useUser'
+} from '@/entities/user/model/useUser'
 
 const profileSchema = z
   .object({

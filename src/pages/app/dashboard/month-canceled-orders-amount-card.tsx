@@ -1,12 +1,13 @@
 import { DollarSign } from 'lucide-react'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useGetMonthCanceledOrdersAmountQuery } from '@/core/hooks/useMetrics'
+import { useGetMonthCanceledOrdersAmountQuery } from '@/entities/metrics/model/useMetrics'
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
 
 import { MetricCardSkeleton } from './metric-card-skeleton'
 
 export function MonthCanceledOrdersAmountCard() {
-  const { data: monthCanceledOrdersAmount } = useGetMonthCanceledOrdersAmountQuery()
+  const { data: monthCanceledOrdersAmount } =
+    useGetMonthCanceledOrdersAmountQuery()
 
   return (
     <Card>

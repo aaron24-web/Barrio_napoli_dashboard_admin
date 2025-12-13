@@ -4,10 +4,10 @@ import { useForm } from 'react-hook-form'
 import { Link, useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { useSignInMutation } from '@/core/hooks/useAuth'
+import { useSignInMutation } from '@/features/auth/model/useAuth'
+import { Button } from '@/shared/ui/button'
+import { Input } from '@/shared/ui/input'
+import { Label } from '@/shared/ui/label'
 
 const signInForm = z.object({
   email: z.string().email('E-mail inválido'),
@@ -19,7 +19,11 @@ type SignInForm = z.infer<typeof signInForm>
 export function SignIn() {
   const [searchParams] = useSearchParams()
 
-  const { register, handleSubmit, formState: { isSubmitting, errors } } = useForm<SignInForm>({
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting, errors },
+  } = useForm<SignInForm>({
     resolver: zodResolver(signInForm),
     defaultValues: {
       email: searchParams.get('email') ?? '',

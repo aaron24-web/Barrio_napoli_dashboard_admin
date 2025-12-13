@@ -1,7 +1,7 @@
 import { DollarSign } from 'lucide-react'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useGetMonthRevenueQuery } from '@/core/hooks/useMetrics'
+import { useGetMonthRevenueQuery } from '@/entities/metrics/model/useMetrics'
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
 
 import { MetricCardSkeleton } from './metric-card-skeleton'
 

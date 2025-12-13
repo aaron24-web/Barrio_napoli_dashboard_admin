@@ -3,15 +3,15 @@ import { Helmet } from 'react-helmet-async'
 import { useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
-import { Pagination } from '@/components/pagination'
+import { getOrders } from '@/entities/order/api/order.service'
+import { Pagination } from '@/shared/ui/pagination'
 import {
   Table,
   TableBody,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { getOrders } from '@/core/services/order.service'
+} from '@/shared/ui/table'
 
 import { OrderTableFilters } from './order-table-filters'
 import { OrderTableRow } from './order-table-row'

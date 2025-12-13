@@ -3,8 +3,8 @@ import { useEffect } from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
 import { Toaster } from 'sonner'
 
-import { Header } from '@/components/Header'
-import { apiClient } from '@/core/api/apiClient'
+import { Header } from '@/app/ui/Header'
+import { apiClient } from '@/shared/api/apiClient'
 
 export function AppLayout() {
   const navigate = useNavigate()

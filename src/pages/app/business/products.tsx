@@ -4,8 +4,7 @@ import { useForm } from 'react-hook-form'
 import { Helmet } from 'react-helmet-async'
 import { z } from 'zod'
 
-import { ImageUploader } from '@/components/image-uploader'
-import { Pagination } from '@/components/pagination'
+import { ImageUploader } from '@/features/image-uploader/ui/image-uploader'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,16 +15,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog'
-import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
+} from '@/shared/ui/alert-dialog'
+import { Button } from '@/shared/ui/button'
+import { Checkbox } from '@/shared/ui/checkbox'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog'
+} from '@/shared/ui/dialog'
 import {
   Form,
   FormControl,
@@ -33,17 +32,18 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+} from '@/shared/ui/form'
+import { Input } from '@/shared/ui/input'
+import { Label } from '@/shared/ui/label'
+import { Pagination } from '@/shared/ui/pagination'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Switch } from '@/components/ui/switch'
+} from '@/shared/ui/select'
+import { Switch } from '@/shared/ui/switch'
 import {
   Table,
   TableBody,
@@ -51,7 +51,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
+} from '@/shared/ui/table'
 
 // Mock data (manteniendo la estructura existente)
 const initialCategories = []

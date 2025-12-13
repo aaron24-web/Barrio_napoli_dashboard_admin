@@ -1,0 +1,24 @@
+import './global.css'
+
+import { QueryClientProvider } from '@tanstack/react-query'
+import { Helmet, HelmetProvider } from 'react-helmet-async'
+import { RouterProvider } from 'react-router-dom'
+import { Toaster } from 'sonner'
+
+import { ThemeProvider } from '@/app/providers/theme-provider'
+import { router } from '@/pages/routes'
+import { queryClient } from '@/shared/lib/queryClient'
+
+export function App() {
+  return (
+    <HelmetProvider>
+      <ThemeProvider storageKey="pizzashop-theme" defaultTheme="dark">
+        <Helmet titleTemplate="%s | Barrio Napoli" />
+        <Toaster richColors closeButton />
+        <QueryClientProvider client={queryClient}>
+          <RouterProvider router={router} />
+        </QueryClientProvider>
+      </ThemeProvider>
+    </HelmetProvider>
+  )
+}

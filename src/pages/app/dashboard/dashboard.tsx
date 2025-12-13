@@ -2,15 +2,15 @@ import { useEffect, useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { toast } from 'sonner'
 
-import { DeliveryPersonInfo } from '@/pages/app/live-orders/delivery-person-info'
-import { OrderDetails } from '@/pages/app/orders/order-details'
-import { Button } from '@/components/ui/button'
-import { useGetOrdersQuery } from '@/core/hooks/useOrders'
-import { DeliveryPerson, OrderStatusType } from '@/core/models'
-
-import { DeliveryMap } from '../live-orders/delivery-map'
-import { IncomingOrdersList } from '../live-orders/incoming-orders-list'
-import { OrderActionsPanel } from '../live-orders/order-actions-panel'
+import { type DeliveryPerson } from '@/entities/delivery/model/delivery.model'
+import { useGetOrdersQuery } from '@/entities/order/model/useOrders'
+import { type OrderStatusType } from '@/entities/order/model/order.model'
+import { Button } from '@/shared/ui/button'
+import { DeliveryMap } from '@/widgets/delivery-map/delivery-map'
+import { DeliveryPersonInfo } from '@/widgets/delivery-person-info/delivery-person-info'
+import { IncomingOrdersList } from '@/widgets/incoming-orders-list/incoming-orders-list'
+import { OrderActionsPanel } from '@/widgets/order-actions-panel/order-actions-panel'
+import { OrderDetails } from '@/widgets/order-details/order-details'
 
 export function Dashboard() {
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null)

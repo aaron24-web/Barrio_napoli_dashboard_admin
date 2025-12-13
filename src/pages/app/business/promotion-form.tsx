@@ -4,9 +4,9 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { DateRange } from 'react-day-picker'
 
-import { ImageUploader } from '@/components/image-uploader'
-import { Button } from '@/components/ui/button'
-import { DateRangePicker } from '@/components/ui/date-range-picker'
+import { ImageUploader } from '@/features/image-uploader/ui/image-uploader'
+import { Button } from '@/shared/ui/button'
+import { DateRangePicker } from '@/shared/ui/date-range-picker'
 import {
   Form,
   FormControl,
@@ -14,16 +14,16 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { MultiSelect } from '@/components/ui/multi-select'
+} from '@/shared/ui/form'
+import { Input } from '@/shared/ui/input'
+import { MultiSelect } from '@/shared/ui/multi-select'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
+} from '@/shared/ui/select'
 
 const promotionFormSchema = z
   .object({

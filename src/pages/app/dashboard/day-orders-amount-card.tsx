@@ -1,7 +1,7 @@
 import { Utensils } from 'lucide-react'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useGetDayOrdersAmountQuery } from '@/core/hooks/useMetrics'
+import { useGetDayOrdersAmountQuery } from '@/entities/metrics/model/useMetrics'
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
 
 import { MetricCardSkeleton } from './metric-card-skeleton'
 

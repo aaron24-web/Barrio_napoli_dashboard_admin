@@ -3,19 +3,18 @@ import { es } from 'date-fns/locale'
 import { ArrowRight, Loader2, Search, X } from 'lucide-react'
 import { useState } from 'react'
 
-import { OrderStatus } from '@/components/order-status'
-import { Button } from '@/components/ui/button'
-import { Dialog, DialogTrigger } from '@/components/ui/dialog'
-import { TableCell, TableRow } from '@/components/ui/table'
 import {
   useApproveOrderMutation,
   useCancelOrderMutation,
   useDeliverOrderMutation,
   useDispatchOrderMutation,
-} from '@/core/hooks/useOrders'
-import { Order } from '@/core/models'
-
-import { OrderDetails } from './order-details'
+} from '@/entities/order/model/useOrders'
+import { type Order } from '@/entities/order/model/order.model'
+import { OrderStatus } from '@/entities/order/ui/order-status'
+import { Button } from '@/shared/ui/button'
+import { Dialog, DialogTrigger } from '@/shared/ui/dialog'
+import { TableCell, TableRow } from '@/shared/ui/table'
+import { OrderDetails } from '@/widgets/order-details/order-details'
 
 interface OrderTableRowProps {
   order: Order

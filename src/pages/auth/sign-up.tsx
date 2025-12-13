@@ -4,22 +4,27 @@ import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 import { z } from 'zod'
 
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { useRegisterRestaurantMutation } from '@/core/hooks/useRestaurant'
+import { useRegisterRestaurantMutation } from '@/entities/restaurant/model/useRestaurant'
+import { Button } from '@/shared/ui/button'
+import { Input } from '@/shared/ui/input'
+import { Label } from '@/shared/ui/label'
 
 const signUpForm = z.object({
   restaurantName: z.string().min(1, 'El nombre del restaurante es obligatorio'),
   managerName: z.string().min(1, 'Tu nombre es obligatorio'),
   phone: z.string().min(1, 'El teléfono es obligatorio'),
   email: z.string().email('E-mail inválido'),
+  password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres'),
 })
 
 type SignUpForm = z.infer<typeof signUpForm>
 
 export function SignUp() {
-  const { register, handleSubmit, formState: { isSubmitting, errors } } = useForm<SignUpForm>({
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting, errors },
+  } = useForm<SignUpForm>({
     resolver: zodResolver(signUpForm),
   })
 
@@ -31,6 +36,7 @@ export function SignUp() {
       managerName: data.managerName,
       email: data.email,
       phone: data.phone,
+      password: data.password,
     })
   }
 
@@ -96,6 +102,20 @@ export function SignUp() {
               <Input id="phone" type="tel" {...register('phone')} />
               {errors.phone && (
                 <p className="text-sm text-red-500">{errors.phone.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password">Tu contraseña</Label>
+              <Input
+                id="password"
+                type="password"
+                {...register('password')}
+              />
+              {errors.password && (
+                <p className="text-sm text-red-500">
+                  {errors.password.message}
+                </p>
               )}
             </div>
 

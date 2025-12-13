@@ -1,8 +1,8 @@
 import { Search } from 'lucide-react'
 
-import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
-import { TableCell, TableRow } from '@/components/ui/table'
+import { Button } from '@/shared/ui/button'
+import { Skeleton } from '@/shared/ui/skeleton'
+import { TableCell, TableRow } from '@/shared/ui/table'
 
 export function OrderTableSkeleton() {
   return Array.from({ length: 10 }).map((_, i) => {

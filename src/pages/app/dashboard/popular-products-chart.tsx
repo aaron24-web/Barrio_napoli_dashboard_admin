@@ -1,13 +1,13 @@
-import { BarChart, Loader2 } from 'lucide-react'
-import { Cell, Pie, PieChart, ResponsiveContainer } from 'recharts'
-import { useState } from 'react'
-import { DateRange } from 'react-day-picker'
 import { subDays } from 'date-fns'
+import { Loader2 } from 'lucide-react'
+import { useState } from 'react'
+import { type DateRange } from 'react-day-picker'
+import { Cell, Pie, PieChart, ResponsiveContainer } from 'recharts'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { colors } from '@/components/ui/colors'
-import { useGetPopularProductsQuery } from '@/core/hooks/useMetrics'
-import { DateRangePicker } from '@/components/ui/date-range-picker'
+import { useGetPopularProductsQuery } from '@/entities/metrics/model/useMetrics'
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
+import { colors } from '@/shared/ui/colors'
+import { DateRangePicker } from '@/shared/ui/date-range-picker'
 
 export function PopularProductsChart() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
