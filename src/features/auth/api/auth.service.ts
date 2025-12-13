@@ -2,6 +2,8 @@
 import { apiClient } from '@/shared/api/apiClient'
 import {
   type ChangePasswordParams,
+  type ForgotPasswordParams,
+  type ResetPasswordParams,
   type SignInParams,
 } from '@/features/auth/model/auth.model'
 
@@ -11,6 +13,18 @@ export const signIn = async (params: SignInParams): Promise<void> => {
 
 export const signOut = async (): Promise<void> => {
   await apiClient.post('/sign-out')
+}
+
+export const forgotPassword = async (
+  params: ForgotPasswordParams,
+): Promise<void> => {
+  await apiClient.post('/password/forgot', params)
+}
+
+export const resetPassword = async (
+  params: ResetPasswordParams,
+): Promise<void> => {
+  await apiClient.post('/password/reset', params)
 }
 
 export const changePassword = async (

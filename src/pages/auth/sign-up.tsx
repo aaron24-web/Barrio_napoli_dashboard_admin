@@ -9,13 +9,19 @@ import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
 import { Label } from '@/shared/ui/label'
 
-const signUpForm = z.object({
-  restaurantName: z.string().min(1, 'El nombre del restaurante es obligatorio'),
-  managerName: z.string().min(1, 'Tu nombre es obligatorio'),
-  phone: z.string().min(1, 'El teléfono es obligatorio'),
-  email: z.string().email('E-mail inválido'),
-  password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres'),
-})
+const signUpForm = z
+  .object({
+    restaurantName: z.string().min(1, 'El nombre del restaurante es obligatorio'),
+    managerName: z.string().min(1, 'Tu nombre es obligatorio'),
+    phone: z.string().min(1, 'El teléfono es obligatorio'),
+    email: z.string().email('E-mail inválido'),
+    password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres'),
+    password_confirmation: z.string(),
+  })
+  .refine((data) => data.password === data.password_confirmation, {
+    message: 'Las contraseñas no coinciden',
+    path: ['password_confirmation'],
+  })
 
 type SignUpForm = z.infer<typeof signUpForm>
 
@@ -115,6 +121,20 @@ export function SignUp() {
               {errors.password && (
                 <p className="text-sm text-red-500">
                   {errors.password.message}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password_confirmation">Confirmar contraseña</Label>
+              <Input
+                id="password_confirmation"
+                type="password"
+                {...register('password_confirmation')}
+              />
+              {errors.password_confirmation && (
+                <p className="text-sm text-red-500">
+                  {errors.password_confirmation.message}
                 </p>
               )}
             </div>

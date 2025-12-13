@@ -78,6 +78,15 @@ export function SignIn() {
             <Button disabled={isSubmitting} className="w-full" type="submit">
               Acceder al panel
             </Button>
+
+            <p className="px-6 text-center text-sm leading-relaxed text-muted-foreground">
+              <Link
+                to="/forgot-password"
+                className="underline underline-offset-4 hover:text-primary"
+              >
+                ¿Olvidaste tu contraseña?
+              </Link>
+            </p>
           </form>
         </div>
       </div>

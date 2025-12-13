@@ -30,6 +30,35 @@ export const useSignOutMutation = () => {
   })
 }
 
+export const useForgotPasswordMutation = () => {
+  return useMutation({
+    mutationFn: AuthService.forgotPassword,
+    onSuccess: () => {
+      toast.success(
+        'Si existe una cuenta con este correo, se ha enviado un enlace de recuperación.',
+      )
+    },
+    onError: () => {
+      toast.error('Ocurrió un error. Por favor, inténtalo de nuevo.')
+    },
+  })
+}
+
+export const useResetPasswordMutation = () => {
+  const navigate = useNavigate()
+
+  return useMutation({
+    mutationFn: AuthService.resetPassword,
+    onSuccess: () => {
+      toast.success('Contraseña actualizada con éxito.')
+      navigate('/sign-in')
+    },
+    onError: () => {
+      toast.error('Ocurrió un error. Por favor, inténtalo de nuevo.')
+    },
+  })
+}
+
 export const useChangePasswordMutation = () => {
   return useMutation({
     mutationFn: AuthService.changePassword,

@@ -14,6 +14,8 @@ import { Orders } from './app/orders/orders'
 import { Reports } from './app/reports/reports'
 import { SalesReportDetail } from './app/reports/sales-report-detail'
 import { Settings } from './app/settings/settings'
+import { ForgotPassword } from './auth/forgot-password'
+import { ResetPassword } from './auth/reset-password'
 import { SignIn } from './auth/sign-in'
 import { SignUp } from './auth/sign-up'
 import { Error } from './error'
@@ -42,6 +44,8 @@ export const router = createBrowserRouter([
     children: [
       { path: '/sign-in', element: <SignIn /> },
       { path: '/sign-up', element: <SignUp /> },
+      { path: '/forgot-password', element: <ForgotPassword /> },
+      { path: '/reset-password', element: <ResetPassword /> },
     ],
   },
   {
