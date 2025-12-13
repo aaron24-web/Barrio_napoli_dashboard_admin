@@ -10,9 +10,9 @@ export function DeliveryPersonInfo({ person }: DeliveryPersonInfoProps) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Información del Repartidor</CardTitle>
+          <CardTitle>Asignar Repartidor</CardTitle>
         </CardHeader>
-        <CardContent className="flex h-full items-center justify-center text-muted-foreground">
+        <CardContent className="flex items-center justify-center p-4 text-center text-muted-foreground">
           Selecciona un repartidor para ver su información.
         </CardContent>
       </Card>
@@ -22,7 +22,7 @@ export function DeliveryPersonInfo({ person }: DeliveryPersonInfoProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Información del Repartidor</CardTitle>
+        <CardTitle>Asignar Repartidor</CardTitle>
       </CardHeader>
       <CardContent className="space-y-2">
         <p>
