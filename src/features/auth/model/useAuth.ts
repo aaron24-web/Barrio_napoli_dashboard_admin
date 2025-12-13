@@ -1,4 +1,5 @@
 // src/core/hooks/useAuth.ts
+import axios from 'axios'
 import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
@@ -13,8 +14,12 @@ export const useSignInMutation = () => {
     onSuccess: () => {
       navigate('/')
     },
-    onError: () => {
-      toast.error('Credenciales inválidas.')
+    onError: (error) => {
+      if (axios.isAxiosError(error) && error.response?.data?.message) {
+        toast.error(error.response.data.message)
+      } else {
+        toast.error('Credenciales inválidas.')
+      }
     },
   })
 }
@@ -38,8 +43,12 @@ export const useForgotPasswordMutation = () => {
         'Si existe una cuenta con este correo, se ha enviado un enlace de recuperación.',
       )
     },
-    onError: () => {
-      toast.error('Ocurrió un error. Por favor, inténtalo de nuevo.')
+    onError: (error) => {
+      if (axios.isAxiosError(error) && error.response?.data?.message) {
+        toast.error(error.response.data.message)
+      } else {
+        toast.error('Ocurrió un error. Por favor, inténtalo de nuevo.')
+      }
     },
   })
 }
@@ -53,8 +62,12 @@ export const useResetPasswordMutation = () => {
       toast.success('Contraseña actualizada con éxito.')
       navigate('/sign-in')
     },
-    onError: () => {
-      toast.error('Ocurrió un error. Por favor, inténtalo de nuevo.')
+    onError: (error) => {
+      if (axios.isAxiosError(error) && error.response?.data?.message) {
+        toast.error(error.response.data.message)
+      } else {
+        toast.error('Ocurrió un error. Por favor, inténtalo de nuevo.')
+      }
     },
   })
 }
@@ -65,10 +78,14 @@ export const useChangePasswordMutation = () => {
     onSuccess: () => {
       toast.success('Contraseña actualizada con éxito.')
     },
-    onError: () => {
-      toast.error(
-        'Error al actualizar la contraseña, por favor intente de nuevo.',
-      )
+    onError: (error) => {
+      if (axios.isAxiosError(error) && error.response?.data?.message) {
+        toast.error(error.response.data.message)
+      } else {
+        toast.error(
+          'Error al actualizar la contraseña, por favor intente de nuevo.',
+        )
+      }
     },
   })
 }

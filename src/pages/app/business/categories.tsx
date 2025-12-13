@@ -2,7 +2,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Helmet } from 'react-helmet-async'
-import { toast } from 'sonner'
 import { z } from 'zod'
 
 import {
@@ -68,31 +67,20 @@ export function Categories() {
   const deleteCategoryMutation = useDeleteCategory()
 
   async function handleCategorySubmit(data: CategoryFormValues) {
-    try {
-      if (editingCategory) {
-        await updateCategoryMutation.mutateAsync({
-          id: editingCategory.id,
-          ...data,
-        })
-        toast.success('Categoría actualizada con éxito.')
-      } else {
-        await createCategoryMutation.mutateAsync(data)
-        toast.success('Categoría creada con éxito.')
-      }
-      setEditingCategory(null)
-      setIsDialogOpen(false)
-    } catch (error) {
-      toast.error('Error al guardar la categoría.')
+    if (editingCategory) {
+      await updateCategoryMutation.mutateAsync({
+        id: editingCategory.id,
+        ...data,
+      })
+    } else {
+      await createCategoryMutation.mutateAsync(data)
     }
+    setEditingCategory(null)
+    setIsDialogOpen(false)
   }
 
   async function handleDeleteCategory(id: string) {
-    try {
-      await deleteCategoryMutation.mutateAsync(id)
-      toast.success('Categoría eliminada con éxito.')
-    } catch (error) {
-      toast.error('Error al eliminar la categoría.')
-    }
+    await deleteCategoryMutation.mutateAsync(id)
   }
 
   return (

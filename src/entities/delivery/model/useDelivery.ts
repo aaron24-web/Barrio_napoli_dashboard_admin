@@ -1,4 +1,5 @@
 // src/core/hooks/useDelivery.ts
+import axios from 'axios'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
@@ -20,8 +21,12 @@ export const useCreateDeliveryManMutation = () => {
       queryClient.invalidateQueries({ queryKey: ['delivery-men'] })
       toast.success('Repartidor creado con éxito.')
     },
-    onError: () => {
-      toast.error('Error al crear el repartidor, por favor intente de nuevo.')
+    onError: (error) => {
+      if (axios.isAxiosError(error) && error.response?.data?.message) {
+        toast.error(error.response.data.message)
+      } else {
+        toast.error('Error al crear el repartidor, por favor intente de nuevo.')
+      }
     },
   })
 }
@@ -41,10 +46,14 @@ export const useUpdateDeliveryManMutation = () => {
       queryClient.invalidateQueries({ queryKey: ['delivery-men'] })
       toast.success('Repartidor actualizado con éxito.')
     },
-    onError: () => {
-      toast.error(
-        'Error al actualizar el repartidor, por favor intente de nuevo.',
-      )
+    onError: (error) => {
+      if (axios.isAxiosError(error) && error.response?.data?.message) {
+        toast.error(error.response.data.message)
+      } else {
+        toast.error(
+          'Error al actualizar el repartidor, por favor intente de nuevo.',
+        )
+      }
     },
   })
 }
@@ -58,8 +67,12 @@ export const useDeleteDeliveryManMutation = () => {
       queryClient.invalidateQueries({ queryKey: ['delivery-men'] })
       toast.success('Repartidor eliminado con éxito.')
     },
-    onError: () => {
-      toast.error('Error al eliminar el repartidor, por favor intente de nuevo.')
+    onError: (error) => {
+      if (axios.isAxiosError(error) && error.response?.data?.message) {
+        toast.error(error.response.data.message)
+      } else {
+        toast.error('Error al eliminar el repartidor, por favor intente de nuevo.')
+      }
     },
   })
 }
@@ -79,10 +92,14 @@ export const useToggleDeliveryManStatusMutation = () => {
       queryClient.invalidateQueries({ queryKey: ['delivery-men'] })
       toast.success('Estado del repartidor actualizado con éxito.')
     },
-    onError: () => {
-      toast.error(
-        'Error al actualizar el estado del repartidor, por favor intente de nuevo.',
-      )
+    onError: (error) => {
+      if (axios.isAxiosError(error) && error.response?.data?.message) {
+        toast.error(error.response.data.message)
+      } else {
+        toast.error(
+          'Error al actualizar el estado del repartidor, por favor intente de nuevo.',
+        )
+      }
     },
   })
 }
@@ -97,8 +114,12 @@ export const useAssignDeliveryManMutation = () => {
       queryClient.invalidateQueries({ queryKey: ['order-details', orderId] })
       toast.success('Repartidor asignado con éxito.')
     },
-    onError: () => {
-      toast.error('Error al asignar el repartidor, por favor intente de nuevo.')
+    onError: (error) => {
+      if (axios.isAxiosError(error) && error.response?.data?.message) {
+        toast.error(error.response.data.message)
+      } else {
+        toast.error('Error al asignar el repartidor, por favor intente de nuevo.')
+      }
     },
   })
 }

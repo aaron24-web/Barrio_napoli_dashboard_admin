@@ -58,3 +58,10 @@ export const updateAddon = async (
 export const deleteAddon = async (addonId: string): Promise<void> => {
   await apiClient.delete(`/addons/${addonId}`)
 }
+
+export const toggleAddonAvailability = async (
+  addonId: string,
+  status: boolean,
+): Promise<void> => {
+  await apiClient.patch(`/addons/${addonId}/toggle-availability`, { status })
+}

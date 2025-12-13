@@ -1,4 +1,5 @@
 // src/core/hooks/useRestaurant.ts
+import axios from 'axios'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
@@ -64,8 +65,12 @@ export const useRegisterRestaurantMutation = () => {
       toast.success('Restaurante registrado con éxito')
       navigate(`/sign-in?email=${variables.email}`)
     },
-    onError: () => {
-      toast.error('Error al registrar el restaurante')
+    onError: (error) => {
+      if (axios.isAxiosError(error) && error.response?.data?.message) {
+        toast.error(error.response.data.message)
+      } else {
+        toast.error('Error al registrar el restaurante')
+      }
     },
   })
 }

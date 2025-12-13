@@ -1,5 +1,7 @@
 // src/core/hooks/useCategories.ts
+import axios from 'axios'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
 import {
   createCategory,
@@ -25,6 +27,14 @@ export const useCreateCategory = () => {
     mutationFn: (payload: CreateCategoryPayload) => createCategory(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] })
+      toast.success('Categoría creada con éxito.')
+    },
+    onError: (error) => {
+      if (axios.isAxiosError(error) && error.response?.data?.message) {
+        toast.error(error.response.data.message)
+      } else {
+        toast.error('Error al crear la categoría.')
+      }
     },
   })
 }
@@ -35,6 +45,14 @@ export const useUpdateCategory = () => {
     mutationFn: (payload: UpdateCategoryPayload) => updateCategory(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] })
+      toast.success('Categoría actualizada con éxito.')
+    },
+    onError: (error) => {
+      if (axios.isAxiosError(error) && error.response?.data?.message) {
+        toast.error(error.response.data.message)
+      } else {
+        toast.error('Error al actualizar la categoría.')
+      }
     },
   })
 }
@@ -45,6 +63,14 @@ export const useDeleteCategory = () => {
     mutationFn: (categoryId: string) => deleteCategory(categoryId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] })
+      toast.success('Categoría eliminada con éxito.')
+    },
+    onError: (error) => {
+      if (axios.isAxiosError(error) && error.response?.data?.message) {
+        toast.error(error.response.data.message)
+      } else {
+        toast.error('Error al eliminar la categoría.')
+      }
     },
   })
 }

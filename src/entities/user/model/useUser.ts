@@ -1,4 +1,5 @@
 // src/core/hooks/useUser.ts
+import axios from 'axios'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
@@ -30,11 +31,15 @@ export const useUpdateProfileMutation = () => {
 
       return { previousProfile }
     },
-    onError: (_, __, context) => {
+    onError: (error, _, context) => {
       if (context?.previousProfile) {
         queryClient.setQueryData(['profile'], context.previousProfile)
       }
-      toast.error('Error al actualizar el perfil, por favor intente de nuevo.')
+      if (axios.isAxiosError(error) && error.response?.data?.message) {
+        toast.error(error.response.data.message)
+      } else {
+        toast.error('Error al actualizar el perfil, por favor intente de nuevo.')
+      }
     },
     onSuccess: () => {
       toast.success('¡Perfil actualizado con éxito!')

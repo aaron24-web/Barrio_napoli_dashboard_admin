@@ -68,6 +68,8 @@ export const useApproveOrderMutation = () => {
     onError: (error: AxiosError) => {
       if (error.response?.status === 409) {
         toast.error('Este pedido ya fue actualizado por otro operador.')
+      } else if (error.response?.data?.message) {
+        toast.error(error.response.data.message)
       } else {
         toast.error('Error al aceptar el pedido, por favor intente de nuevo.')
       }
@@ -85,8 +87,12 @@ export const useCancelOrderMutation = () => {
       queryClient.invalidateQueries({ queryKey: ['order-details', orderId] })
       toast.success('Pedido cancelado con éxito.')
     },
-    onError: () => {
-      toast.error('Error al cancelar el pedido, por favor intente de nuevo.')
+    onError: (error: AxiosError) => {
+      if (error.response?.data?.message) {
+        toast.error(error.response.data.message)
+      } else {
+        toast.error('Error al cancelar el pedido, por favor intente de nuevo.')
+      }
     },
   })
 }
@@ -101,8 +107,12 @@ export const useDispatchOrderMutation = () => {
       queryClient.invalidateQueries({ queryKey: ['order-details', orderId] })
       toast.success(`Pedido ${orderId} enviado.`)
     },
-    onError: () => {
-      toast.error('Error al enviar el pedido, por favor intente de nuevo.')
+    onError: (error: AxiosError) => {
+      if (error.response?.data?.message) {
+        toast.error(error.response.data.message)
+      } else {
+        toast.error('Error al enviar el pedido, por favor intente de nuevo.')
+      }
     },
   })
 }
@@ -117,8 +127,12 @@ export const useDeliverOrderMutation = () => {
       queryClient.invalidateQueries({ queryKey: ['order-details', orderId] })
       toast.success(`Pedido ${orderId} entregado.`)
     },
-    onError: () => {
-      toast.error('Error al entregar el pedido, por favor intente de nuevo.')
+    onError: (error: AxiosError) => {
+      if (error.response?.data?.message) {
+        toast.error(error.response.data.message)
+      } else {
+        toast.error('Error al entregar el pedido, por favor intente de nuevo.')
+      }
     },
   })
 }
@@ -133,8 +147,12 @@ export const useFinishOrderMutation = () => {
       queryClient.invalidateQueries({ queryKey: ['order-details', orderId] })
       toast.success(`Pedido ${orderId} finalizado.`)
     },
-    onError: () => {
-      toast.error('Error al finalizar el pedido, por favor intente de nuevo.')
+    onError: (error: AxiosError) => {
+      if (error.response?.data?.message) {
+        toast.error(error.response.data.message)
+      } else {
+        toast.error('Error al finalizar el pedido, por favor intente de nuevo.')
+      }
     },
   })
 }
