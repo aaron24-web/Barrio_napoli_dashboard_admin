@@ -1,7 +1,8 @@
-import { zodResolver } from '@hookform/resolvers/zod'
+import { ArrowLeft } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Helmet } from 'react-helmet-async'
+import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
@@ -145,37 +146,45 @@ export function Addons() {
           <h1 className="text-3xl font-bold tracking-tight">
             Gestión de Complementos
           </h1>
-          <Dialog
-            open={isDialogOpen}
-            onOpenChange={(open) => {
-              if (!open) setEditingAddon(null)
-              setIsDialogOpen(open)
-            }}
-          >
-            <DialogTrigger asChild>
-              <Button onClick={() => setEditingAddon(null)}>
-                Crear Complemento
+          <div className="flex items-center gap-2">
+            <Link to="/business/menu">
+              <Button variant="outline">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Volver al menú
               </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>
-                  {editingAddon ? 'Editar Complemento' : 'Crear Complemento'}
-                </DialogTitle>
-              </DialogHeader>
-              <AddonForm
-                key={editingAddon?.id || 'new'}
-                addon={editingAddon}
-                onSubmit={handleAddonSubmit}
-                onCancel={() => setIsDialogOpen(false)}
-                categories={categories || []}
-                isSubmitting={
-                  createAddonMutation.isPending ||
-                  updateAddonMutation.isPending
-                }
-              />
-            </DialogContent>
-          </Dialog>
+            </Link>
+            <Dialog
+              open={isDialogOpen}
+              onOpenChange={(open) => {
+                if (!open) setEditingAddon(null)
+                setIsDialogOpen(open)
+              }}
+            >
+              <DialogTrigger asChild>
+                <Button onClick={() => setEditingAddon(null)}>
+                  Crear Complemento
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>
+                    {editingAddon ? 'Editar Complemento' : 'Crear Complemento'}
+                  </DialogTitle>
+                </DialogHeader>
+                <AddonForm
+                  key={editingAddon?.id || 'new'}
+                  addon={editingAddon}
+                  onSubmit={handleAddonSubmit}
+                  onCancel={() => setIsDialogOpen(false)}
+                  categories={categories || []}
+                  isSubmitting={
+                    createAddonMutation.isPending ||
+                    updateAddonMutation.isPending
+                  }
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <Input

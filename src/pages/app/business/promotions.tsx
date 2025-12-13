@@ -1,5 +1,8 @@
 import { useState } from 'react'
 import { Helmet } from 'react-helmet-async'
+import { Link } from 'react-router-dom'
+import { ArrowLeft } from 'lucide-react'
+import { z } from 'zod'
 
 import { Pagination } from '@/shared/ui/pagination'
 import {
@@ -109,33 +112,41 @@ export function Promotions() {
           <h1 className="text-3xl font-bold tracking-tight">
             Gestión de Promociones
           </h1>
-          <Dialog
-            open={isDialogOpen}
-            onOpenChange={(open) => {
-              if (!open) setEditingPromotion(null)
-              setIsDialogOpen(open)
-            }}
-          >
-            <DialogTrigger asChild>
-              <Button onClick={() => setEditingPromotion(null)}>
-                Crear Promoción
+          <div className="flex items-center gap-2">
+            <Link to="/business/menu">
+              <Button variant="outline">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Volver al menú
               </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[625px]">
-              <DialogHeader>
-                <DialogTitle>
-                  {editingPromotion ? 'Editar Promoción' : 'Crear Promoción'}
-                </DialogTitle>
-              </DialogHeader>
-              <PromotionForm
-                key={editingPromotion?.id || 'new'}
-                promotion={editingPromotion}
-                onSubmit={handlePromotionSubmit}
-                onCancel={() => setIsDialogOpen(false)}
-                productOptions={productOptions}
-              />
-            </DialogContent>
-          </Dialog>
+            </Link>
+            <Dialog
+              open={isDialogOpen}
+              onOpenChange={(open) => {
+                if (!open) setEditingPromotion(null)
+                setIsDialogOpen(open)
+              }}
+            >
+              <DialogTrigger asChild>
+                <Button onClick={() => setEditingPromotion(null)}>
+                  Crear Promoción
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[625px]">
+                <DialogHeader>
+                  <DialogTitle>
+                    {editingPromotion ? 'Editar Promoción' : 'Crear Promoción'}
+                  </DialogTitle>
+                </DialogHeader>
+                <PromotionForm
+                  key={editingPromotion?.id || 'new'}
+                  promotion={editingPromotion}
+                  onSubmit={handlePromotionSubmit}
+                  onCancel={() => setIsDialogOpen(false)}
+                  productOptions={productOptions}
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <Input

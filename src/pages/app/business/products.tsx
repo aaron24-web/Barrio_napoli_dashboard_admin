@@ -1,6 +1,6 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { ArrowLeft } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { z } from 'zod'
 
@@ -147,34 +147,42 @@ export function Products() {
           <h1 className="text-3xl font-bold tracking-tight">
             Gestión de Productos
           </h1>
-          <Dialog
-            open={isDialogOpen}
-            onOpenChange={(open) => {
-              if (!open) setEditingProduct(null)
-              setIsDialogOpen(open)
-            }}
-          >
-            <DialogTrigger asChild>
-              <Button onClick={() => setEditingProduct(null)}>
-                Crear Producto
+          <div className="flex items-center gap-2">
+            <Link to="/business/menu">
+              <Button variant="outline">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Volver al menú
               </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>
-                  {editingProduct ? 'Editar Producto' : 'Crear Producto'}
-                </DialogTitle>
-              </DialogHeader>
-              <ProductForm
-                key={editingProduct?.id || 'new'}
-                product={editingProduct}
-                onSubmit={handleProductSubmit}
-                onCancel={() => setIsDialogOpen(false)}
-                categories={categories}
-                addons={addons}
-              />
-            </DialogContent>
-          </Dialog>
+            </Link>
+            <Dialog
+              open={isDialogOpen}
+              onOpenChange={(open) => {
+                if (!open) setEditingProduct(null)
+                setIsDialogOpen(open)
+              }}
+            >
+              <DialogTrigger asChild>
+                <Button onClick={() => setEditingProduct(null)}>
+                  Crear Producto
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>
+                    {editingProduct ? 'Editar Producto' : 'Crear Producto'}
+                  </DialogTitle>
+                </DialogHeader>
+                <ProductForm
+                  key={editingProduct?.id || 'new'}
+                  product={editingProduct}
+                  onSubmit={handleProductSubmit}
+                  onCancel={() => setIsDialogOpen(false)}
+                  categories={categories}
+                  addons={addons}
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <Input

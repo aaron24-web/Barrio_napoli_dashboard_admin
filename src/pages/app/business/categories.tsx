@@ -1,7 +1,8 @@
-import { zodResolver } from '@hookform/resolvers/zod'
+import { ArrowLeft } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Helmet } from 'react-helmet-async'
+import { Link } from 'react-router-dom'
 import { z } from 'zod'
 
 import {
@@ -91,36 +92,44 @@ export function Categories() {
           <h1 className="text-3xl font-bold tracking-tight">
             Gestión de Categorías
           </h1>
-          <Dialog
-            open={isDialogOpen}
-            onOpenChange={(open) => {
-              if (!open) setEditingCategory(null)
-              setIsDialogOpen(open)
-            }}
-          >
-            <DialogTrigger asChild>
-              <Button onClick={() => setEditingCategory(null)}>
-                Crear Categoría
+          <div className="flex items-center gap-2">
+            <Link to="/business/menu">
+              <Button variant="outline">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Volver al menú
               </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>
-                  {editingCategory ? 'Editar Categoría' : 'Crear Categoría'}
-                </DialogTitle>
-              </DialogHeader>
-              <CategoryForm
-                key={editingCategory?.id || 'new'}
-                category={editingCategory}
-                onSubmit={handleCategorySubmit}
-                onCancel={() => setIsDialogOpen(false)}
-                isSubmitting={
-                  createCategoryMutation.isPending ||
-                  updateCategoryMutation.isPending
-                }
-              />
-            </DialogContent>
-          </Dialog>
+            </Link>
+            <Dialog
+              open={isDialogOpen}
+              onOpenChange={(open) => {
+                if (!open) setEditingCategory(null)
+                setIsDialogOpen(open)
+              }}
+            >
+              <DialogTrigger asChild>
+                <Button onClick={() => setEditingCategory(null)}>
+                  Crear Categoría
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>
+                    {editingCategory ? 'Editar Categoría' : 'Crear Categoría'}
+                  </DialogTitle>
+                </DialogHeader>
+                <CategoryForm
+                  key={editingCategory?.id || 'new'}
+                  category={editingCategory}
+                  onSubmit={handleCategorySubmit}
+                  onCancel={() => setIsDialogOpen(false)}
+                  isSubmitting={
+                    createCategoryMutation.isPending ||
+                    updateCategoryMutation.isPending
+                  }
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
         <div className="rounded-md border">
           <Table>
