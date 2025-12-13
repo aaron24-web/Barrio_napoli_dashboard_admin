@@ -34,7 +34,7 @@ import { Timer } from '@/shared/ui/timer'
 import { OrderDetailsSkeleton } from './order-details-skeleton'
 
 export interface OrderDetailsProps {
-  orderId: string
+  orderId: string | null
 }
 
 const assignDeliveryManSchema = z.object({
@@ -85,6 +85,14 @@ export function OrderDetails({ orderId }: OrderDetailsProps) {
         timestamp: new Date().toISOString(),
       },
     ])
+  }
+
+  if (!orderId) {
+    return (
+      <div className="flex h-full items-center justify-center text-muted-foreground">
+        Selecciona un pedido para ver los detalles.
+      </div>
+    )
   }
 
   return (

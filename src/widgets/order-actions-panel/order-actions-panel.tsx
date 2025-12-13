@@ -11,7 +11,7 @@ import { OrderStatus } from '@/entities/order/ui/order-status'
 import { Button } from '@/shared/ui/button'
 
 interface OrderActionsPanelProps {
-  orderId: string
+  orderId: string | null
   status: OrderStatus
 }
 
@@ -36,7 +36,7 @@ export function OrderActionsPanel({ orderId, status }: OrderActionsPanelProps) {
       {status === 'pending' && (
         <Button
           onClick={() => approveOrderFn(orderId)}
-          disabled={isApprovingOrder}
+          disabled={isApprovingOrder || !orderId}
           variant="outline"
           size="xs"
         >
@@ -52,7 +52,7 @@ export function OrderActionsPanel({ orderId, status }: OrderActionsPanelProps) {
       {status === 'accepted' && (
         <Button
           onClick={() => dispatchOrderFn(orderId)}
-          disabled={isDispatchingOrder}
+          disabled={isDispatchingOrder || !orderId}
           variant="outline"
           size="xs"
         >
@@ -68,7 +68,7 @@ export function OrderActionsPanel({ orderId, status }: OrderActionsPanelProps) {
       {status === 'processing' && (
         <Button
           onClick={() => deliverOrderFn(orderId)}
-          disabled={isDeliveringOrder}
+          disabled={isDeliveringOrder || !orderId}
           variant="outline"
           size="xs"
         >
@@ -84,7 +84,7 @@ export function OrderActionsPanel({ orderId, status }: OrderActionsPanelProps) {
       {status === 'delivering' && (
         <Button
           onClick={() => finishOrderFn(orderId)}
-          disabled={isFinishingOrder}
+          disabled={isFinishingOrder || !orderId}
           variant="outline"
           size="xs"
         >
@@ -100,7 +100,8 @@ export function OrderActionsPanel({ orderId, status }: OrderActionsPanelProps) {
       <Button
         disabled={
           !['pending', 'accepted', 'processing'].includes(status) ||
-          isCancellingOrder
+          isCancellingOrder ||
+          !orderId
         }
         onClick={() => cancelOrderFn(orderId)}
         variant="ghost"

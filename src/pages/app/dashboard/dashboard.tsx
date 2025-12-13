@@ -77,21 +77,15 @@ export function Dashboard() {
             <DeliveryMap onSelectDeliveryPerson={handleSelectDeliveryPerson} />
           </div>
           <div className="col-span-3 flex flex-col gap-4">
-            {selectedOrderId && (
-              <>
-                <OrderActionsPanel
-                  orderId={selectedOrderId}
-                  status={
-                    orders?.results.find((o) => o.orderId === selectedOrderId)
-                      ?.status ?? 'pending'
-                  }
-                />
-                <OrderDetails orderId={selectedOrderId} />
-              </>
-            )}
-            {selectedDeliveryPerson && (
-              <DeliveryPersonInfo person={selectedDeliveryPerson} />
-            )}
+            <OrderActionsPanel
+              orderId={selectedOrderId}
+              status={
+                orders?.results.find((o) => o.orderId === selectedOrderId)
+                  ?.status ?? 'pending'
+              }
+            />
+            <OrderDetails orderId={selectedOrderId} />
+            <DeliveryPersonInfo person={selectedDeliveryPerson} />
           </div>
         </div>
       </div>

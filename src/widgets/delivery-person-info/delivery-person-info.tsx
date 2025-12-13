@@ -2,10 +2,23 @@ import { type DeliveryPerson } from '@/entities/delivery/model/delivery.model'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
 
 interface DeliveryPersonInfoProps {
-  person: DeliveryPerson
+  person: DeliveryPerson | null
 }
 
 export function DeliveryPersonInfo({ person }: DeliveryPersonInfoProps) {
+  if (!person) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Información del Repartidor</CardTitle>
+        </CardHeader>
+        <CardContent className="flex h-full items-center justify-center text-muted-foreground">
+          Selecciona un repartidor para ver su información.
+        </CardContent>
+      </Card>
+    )
+  }
+
   return (
     <Card>
       <CardHeader>
